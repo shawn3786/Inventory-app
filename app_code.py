@@ -166,7 +166,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
         else:
             st.write("No image found for this item.")
 
-        qty = st.number_input("Enter quantity:", min_value=0, step=1, key=current_item_data['name'])
+        qty = st.text_input("Enter quantity:", min_value=0, step=1, key=current_item_data['name'])
 
         col1, col2, col3, col4= st.columns(4)
 
