@@ -155,7 +155,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
 
     # Ensure we don't go out of bounds if rerun occurs after completion
     if st.session_state.index < len(inventory_items):
-        current_item_data = inventory_items[st.session_state.index] # Renamed to avoid confusion with the original string 'current'
+        current_item_data = inventory_items[st.session_state.index] 
         
         st.subheader(f"Item: {current_item_data['name']}")
 
@@ -208,10 +208,25 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
+        
+elif st.button("🚫 Add Finished Item", key="add_finish_button"):
+    st.title("Please Write the Name of items Which you are thinking its going to be finished")
+    qty = st.text_input("Write the name of items:", key=current_item_data['name'])
+     with open(FINISHED_FILE, "a") as f:
+        f.write(qty)
 
-    st.write("### Skipped Items:")
-    if st.session_state.skipped: # Only show if there are skipped items
-        for item in st.session_state.skipped:
-            st.write(f"- {item}")
-    else:
-        st.write("No items skipped yet.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
