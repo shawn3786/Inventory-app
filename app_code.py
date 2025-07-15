@@ -21,7 +21,9 @@ elif st.session_state.page == "menu":
         if st.button("📦Start Inventory", key="start_invr_button"):
             st.session_state.page = "inventory" # Corrected assignment
             st.rerun()
-        st.button("🚫 Add Finished Item", key="add_finish_button")
+        if st.button("🚫 Add Finished Item", key="add_finish_button"):
+            st.session_stage.page = " Add Finished Stock"
+            st.rerun
         st.button("📈Add new items in inventory list", key="add_item_button")
     with col2:
         st.button("🛒 Make New Order", key="new_order_button")
@@ -209,7 +211,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
     else:
         st.write("No quantities collected yet.")
         
-elif st.button("🚫 Add Finished Item", key="add_finish_button"):
+elif st.session_stage.page == " Add Finished Stock":
     st.title("Please Write the Name of items Which you are thinking its going to be finished")
     qty = st.text_input("Write the name of items:", key=current_item_data['name'])
     with open(FINISHED_FILE, "a") as f:
