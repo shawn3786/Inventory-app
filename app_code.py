@@ -23,7 +23,7 @@ elif st.session_state.page == "menu":
             st.rerun()
         elif st.button("🚫 Add Finished Item", key="add_finish_button"):
             st.session_state.page = " Add Finished Stock"
-            st.rerun
+            st.rerun()
         st.button("📈Add new items in inventory list", key="add_item_button")
     with col2:
         st.button("🛒 Make New Order", key="new_order_button")
