@@ -138,7 +138,7 @@ elif st.session_state.page == "menu":
             st.session_state.page = "New Stock"
             st.rerun()
             
-if st.session_state.page == "inventory":
+elif st.session_state.page == "inventory":
     st.title("🧾 Select Inventory Type")
     if 'inventory_type' not in st.session_state:
         st.session_state.inventory_type = None
@@ -267,6 +267,7 @@ if st.session_state.page == "inventory":
             del st.session_state.skipped
             st.rerun()
 
+      
 elif st.session_state.page == "New Stock":
 
     # Session state setup
