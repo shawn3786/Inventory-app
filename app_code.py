@@ -213,27 +213,35 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
 
 
 elif st.session_state.page == "Add Finished Stock":
+   if "page" not in st.session_state:
+        st.session_state.page = "Add Finished Stock"  # For testing directly
+
+    if "finished_items" not in st.session_state:
+        st.session_state.finished_items = []
+
+    FINISHED_FILE = "Finished_Items.txt"
+
     st.title("📦 Add Finished Stock")
-    st.write("Please write the name of items you anticipate will be finished soon.")
+    st.write("Write the name of items you expect to finish soon.")
 
-    if "finished_key" not in st.session_state:
-        st.session_state.finished_key = 0
 
-    finish_item = st.text_input("Write the name of item:", key=f"finished_input_{st.session_state.finished_key}")
+    finish_item = st.text_input("Item name:", value="")
 
-    col1, col2 = st.columns(2)
 
-    with col1:
-        if st.button("💾 Save & Add Another"):
-            if finish_item.strip() != "":
-                with open("Finished_Items.txt", "a") as f:
-                    f.write(finish_item.strip() + "\n")
-                st.success(f"'{finish_item.strip()}' saved successfully!")
-                st.session_state.finished_key += 1
-            else:
-                st.warning("Please write an item name before saving.")
-    with col2:
-        if st.button("🏡 Main Menu"):
+    if st.button("💾 Save"):
+        item_clean = finish_item.strip()
+        if item_clean:
+        
+            with open(FINISHED_FILE, "a") as f:
+                f.write(item_clean + "\n")
+
+      
+            st.session_state.finished_items.append(item_clean)
+            st.success(f"'{item_clean}' saved!")
+    else:
+        st.warning("Please enter an item name.")
+   
+    if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
             st.rerun()
 
