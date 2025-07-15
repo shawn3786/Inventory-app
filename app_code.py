@@ -38,9 +38,8 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
         {"name": "Fries", "image": "Fries.jpg"},
         {"name": "Burger Buns", "image": "Burger Buns.jpg"}, # No image available
         {"name": "Potato Pops", "image": "Potato Pops.jpg"},
-        # ... continue for all your items, adding appropriate paths or None
         {"name": "Onion Rings", "image":"Onion Rings.jpg" },
-        {"name": "chicken Nugets Pops", "image":" Chicken Nugets.jpg"},
+        {"name": "chicken Nugets Pops", "image":"Chicken Nugets.jpg"},
         {"name": "Chili Cheese Nugets", "image": "Chili Cheese Nugets.jpg"},
         {"name": "Becons", "image": "Becons.jpg"},
         {"name": "Churros", "image": "churros.jpg"},
@@ -172,24 +171,21 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
         col1, col2, col3, col4= st.columns(4)
 
         with col1:
-            if st.button("Back"):
-                if st.session_state.index > 0:
-                    # Save current quantity before going back
-                    st.session_state.quantities[current_item_data['name']] = qty
-                    st.session_state.index -= 1
-                    st.rerun()
-
+            if st.button("Next"):
+                st.session_state.quantities[current_item_data['name']] = qty
+                st.session_state.index += 1
+                st.rerun() # Rerun to update the item display
         with col2:
             if st.button("Skip"):
                 st.session_state.skipped.append(current_item_data['name'])
                 st.session_state.index += 1
                 st.rerun()
-
         with col3:
-            if st.button("Next"):
-                st.session_state.quantities[current_item_data['name']] = qty
-                st.session_state.index += 1
-                st.rerun() # Rerun to update the item display
+             if st.button("Back"):
+                if st.session_state.index > 0:
+                    st.session_state.quantities[current_item_data['name']] = qty
+                    st.session_state.index -= 1
+                    st.rerun()
         with col4:
             if st.button("Main Menu "):
                  st.session_state.page = "menu"
