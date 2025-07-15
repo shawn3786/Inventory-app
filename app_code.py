@@ -236,7 +236,7 @@ elif st.session_state.page == " Add Finished Stock":
     with col2:
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
-            st.rerun
+            
 elif  st.session_state.page == "Add Inventory Items":
     st.title("New Inventory Items")
     st.title("Please write the name of items that are new in stock. Please do not try to re-add the name of items already in Inventory List.")
