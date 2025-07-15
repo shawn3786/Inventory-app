@@ -1,7 +1,6 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import os
-import pickle
 inventory_items = [
 {"name": "Wings", "image": "Wings.jpg"}, # Example path
 {"name": "Filets", "image": "Filets.jpg"}, # Example path
@@ -133,16 +132,11 @@ elif st.session_state.page == "menu":
         if st.button("📦Start Inventory", key="start_invr_button"):
             st.session_state.page = "inventory" # Corrected assignment
             st.rerun()
-        if st.button("🚫 Add Finished Item", key="add_finish_button"):
-            st.session_state.page = "Add Finished Stock"
-            st.rerun()
-        if st.button("📈Add new items in inventory list", key="add_item_button"):
-            st.session_state.page = "Add Inventory Items"
-            st.rerun()
     with col2:
-        st.button("🛒 Make New Order", key="new_order_button")
-        st.button("⚠️ Check Low Stock", key="low_stock_button")
-
+        if st.button("🛒 Make New Order", key="new_order_button"):
+            st.session_state.page = "New Stock"
+            st.rerun()
+            
 elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' for consistency
 
     if 'index' not in st.session_state:
@@ -209,103 +203,69 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-import streamlit as st
-import os
-import base64
-import requests
+elif st.session_state.page == "New Stock":
+     if 'index' not in st.session_state:
+        st.session_state.index = 0
 
-# Load secret token securely
-GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]  # Or use os.getenv("GITHUB_TOKEN")
-REPO_OWNER = "shawn3786"
-REPO_NAME = "inventory-app"
-BRANCH_NAME = "main"
-GITHUB_FILE_PATH = "data/Finished_Items.txt"  # where file will be saved in repo
-LOCAL_FILE_PATH = "/tmp/Finished_Items.txt"
+    if 'quantities' not in st.session_state:
+        st.session_state.quantities = {}
 
-# UI
-st.title("📦 Save Finished Items to GitHub")
-item = st.text_input("Enter finished item name:")
+    if 'skipped' not in st.session_state:
+        st.session_state.skipped = []
 
-if st.button("💾 Save and Push to GitHub"):
-    item_clean = item.strip()
-    if not item_clean:
-        st.warning("Please enter a valid item.")
-    else:
-        try:
-            # Save locally first
-            with open(LOCAL_FILE_PATH, "a") as f:
-                f.write(item_clean + "\n")
-            st.success("✅ Item saved locally.")
+    # Ensure we don't go out of bounds if rerun occurs after completion
+    if st.session_state.index < len(inventory_items):
+        current_item_data = inventory_items[st.session_state.index] 
 
-            # Read & encode content
-            with open(LOCAL_FILE_PATH, "r") as f:
-                content = f.read()
-            encoded = base64.b64encode(content.encode()).decode()
+        st.subheader(f"Item: {current_item_data['name']}")
 
-            # GitHub API URL
-            api_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{GITHUB_FILE_PATH}"
-            headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        if current_item_data['image'] and os.path.exists(current_item_data['image']):
+            image = Image.open(current_item_data['image'])
+            st.image(image, width=400)
+        else:
+            st.write("No image found for this item.")
 
-            # Get SHA if file already exists
-            sha = None
-            res = requests.get(api_url, headers=headers)
-            if res.status_code == 200:
-                sha = res.json()["sha"]
 
-            # Push to GitHub
-            payload = {
-                "message": "Update finished items",
-                "content": encoded,
-                "branch": BRANCH_NAME
-            }
-            if sha:
-                payload["sha"] = sha
+        qty = st.text_input("Enter quantity:", key=current_item_data['name'])
 
-            response = requests.put(api_url, headers=headers, json=payload)
-            if response.status_code in [200, 201]:
-                st.success("🚀 Finished items pushed to GitHub!")
-            else:
-                st.error(f"❌ Push failed: {response.json()}")
-        except Exception as e:
-            st.error(f"❌ Error: {e}")
+        col1, col2, col3, col4= st.columns(4)
 
-# ---------------------- Add New Inventory Item Page ----------------------
-elif st.session_state.page == "Add New Item":
-    st.title("🆕 Add New Inventory Item")
-    st.write("Please write the name of items that are new in stock.")
-    st.warning("⚠️ Do not try to re-add items already in the inventory.")
-
-    INVENTORY_FILE = "inventory_items_dict.pkl"
-
-    if os.path.exists(INVENTORY_FILE):
-        with open(INVENTORY_FILE, "rb") as f:
-            inventory = pickle.load(f)
-    else:
-        inventory = {}
-
-    if "new_item_key" not in st.session_state:
-        st.session_state.new_item_key = 0
-
-    new_item = st.text_input("Enter new item name:", key=f"new_input_{st.session_state.new_item_key}")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button("✅ Save New Item"):
-            item_clean = new_item.strip().capitalize()
-            if item_clean == "":
-                st.warning("Please enter an item name.")
-            elif item_clean in inventory:
-                st.error(f"'{item_clean}' already exists in inventory.")
-            else:
-                inventory[item_clean] = {"name": item_clean, "image": "none"}
-                with open(INVENTORY_FILE, "wb") as f:
-                    pickle.dump(inventory, f)
-                st.success(f"'{item_clean}' added to inventory.")
-                st.session_state.new_item_key += 1
+        with col1:
+            if st.button("Next"):
+                st.session_state.quantities[current_item_data['name']] = qty
+                st.session_state.index += 1
+                st.rerun() # Rerun to update the item display
+        with col2:
+            if st.button("Skip"):
+                st.session_state.skipped.append(current_item_data['name'])
+                st.session_state.index += 1
                 st.rerun()
+        with col3:
+             if st.button("Back"):
+                if st.session_state.index > 0:
+                    st.session_state.quantities[current_item_data['name']] = qty
+                    st.session_state.index -= 1
+                    st.rerun()
+        with col4:
+            if st.button("🏡 Main Menu "):
+                 st.session_state.page = "menu"
+                 st.rerun()
 
-    with col2:
-        if st.button("🏡 Main Menu"):
+
+    if st.session_state.index >= len(inventory_items):
+        st.success("✅ Inventory complete!")
+        # You might want to add a button here to go to a summary page or back to menu
+        if st.button("Back to Menu"):
             st.session_state.page = "menu"
+            st.session_state.index = 0 # Reset index for next inventory run
+            st.session_state.quantities = {} # Clear quantities
+            st.session_state.skipped = [] # Clear skipped
             st.rerun()
+
+    st.write("### Collected Quantities:")
+    if st.session_state.quantities: # Only show if there are quantities collected
+        for item, q in st.session_state.quantities.items():
+            st.write(f"- {item}: {q}")
+    else:
+        st.write("No quantities collected yet.")
+        
