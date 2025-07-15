@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
+from fpdf import FPDF
 import os
 inventory_items = [
 {"name": "Wings", "image": "Wings.jpg"}, # Example path
@@ -156,7 +157,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
 
         if current_item_data['image'] and os.path.exists(current_item_data['image']):
             image = Image.open(current_item_data['image'])
-            st.image(image, width=400)
+            st.image(image, width=200)
         else:
             st.write("No image found for this item.")
 
@@ -204,68 +205,86 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
     else:
         st.write("No quantities collected yet.")
 elif st.session_state.page == "New Stock":
+
+    # Session state setup
     if 'index' not in st.session_state:
         st.session_state.index = 0
-
     if 'quantities' not in st.session_state:
         st.session_state.quantities = {}
-
     if 'skipped' not in st.session_state:
         st.session_state.skipped = []
-
-    # Ensure we don't go out of bounds if rerun occurs after completion
+    
+    # Ensure we don't go out of bounds
     if st.session_state.index < len(inventory_items):
-        current_item_data = inventory_items[st.session_state.index] 
-
+        current_item_data = inventory_items[st.session_state.index]
         st.subheader(f"Item: {current_item_data['name']}")
-
+    
         if current_item_data['image'] and os.path.exists(current_item_data['image']):
             image = Image.open(current_item_data['image'])
-            st.image(image, width=400)
+            st.image(image, width=200)
         else:
             st.write("No image found for this item.")
-
-
+    
         qty = st.text_input("Enter quantity:", key=current_item_data['name'])
-
-        col1, col2, col3, col4= st.columns(4)
-
+    
+        col1, col2, col3, col4 = st.columns(4)
+    
         with col1:
             if st.button("Next"):
                 st.session_state.quantities[current_item_data['name']] = qty
                 st.session_state.index += 1
-                st.rerun() # Rerun to update the item display
+                st.rerun()
         with col2:
             if st.button("Skip"):
                 st.session_state.skipped.append(current_item_data['name'])
                 st.session_state.index += 1
                 st.rerun()
         with col3:
-             if st.button("Back"):
+            if st.button("Back"):
                 if st.session_state.index > 0:
                     st.session_state.quantities[current_item_data['name']] = qty
                     st.session_state.index -= 1
                     st.rerun()
         with col4:
-            if st.button("🏡 Main Menu "):
-                 st.session_state.page = "menu"
-                 st.rerun()
-
-
+            if st.button("🏡 Main Menu"):
+                st.session_state.page = "menu"
+                st.rerun()
+    
+    # When all items are done
     if st.session_state.index >= len(inventory_items):
         st.success("✅ Inventory complete!")
-        # You might want to add a button here to go to a summary page or back to menu
+    
         if st.button("Back to Menu"):
             st.session_state.page = "menu"
-            st.session_state.index = 0 # Reset index for next inventory run
-            st.session_state.quantities = {} # Clear quantities
-            st.session_state.skipped = [] # Clear skipped
+            st.session_state.index = 0
+            st.session_state.quantities = {}
+            st.session_state.skipped = []
             st.rerun()
-
-    st.write("### Collected Quantities:")
-    if st.session_state.quantities: # Only show if there are quantities collected
-        for item, q in st.session_state.quantities.items():
-            st.write(f"- {item}: {q}")
-    else:
-        st.write("No quantities collected yet.")
-        
+    
+        # Show collected quantities
+        st.write("### Collected Quantities:")
+        if st.session_state.quantities:
+            for item, q in st.session_state.quantities.items():
+                st.write(f"- {item}: {q}")
+        else:
+            st.write("No quantities collected yet.")
+    
+        # ✅ Generate PDF from collected data
+        def generate_inventory_pdf(data_dict):
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt="Inventory Quantities", ln=True, align='C')
+            pdf.ln(10)
+            for item, qty in data_dict.items():
+                pdf.cell(200, 10, txt=f"{item}: {qty}", ln=True)
+            return pdf.output(dest="S").encode("latin-1")
+    
+        if st.session_state.quantities:
+            pdf_data = generate_inventory_pdf(st.session_state.quantities)
+            st.download_button(
+                label="📄 Download Inventory Summary as PDF",
+                data=pdf_data,
+                file_name="Inventory_Summary.pdf",
+                mime="application/pdf"
+            )
