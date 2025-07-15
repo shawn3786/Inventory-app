@@ -23,7 +23,7 @@ elif st.session_state.page == "menu":
             st.session_state.page = "inventory" # Corrected assignment
             st.rerun()
         elif st.button("🚫 Add Finished Item", key="add_finish_button"):
-            st.session_state.page = " Add Finished Stock"
+            st.session_state.page = "Add Finished Stock"
             st.rerun()
         elif st.button("📈Add new items in inventory list", key="add_item_button"):
             st.session_state.page = "Add Inventory Items"
@@ -213,7 +213,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-elif st.session_state.page == "Add Finished Stock":
+elif st.session_state.page == "Add Finished Stock"
     st.title("Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
     
