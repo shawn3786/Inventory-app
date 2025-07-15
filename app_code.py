@@ -219,6 +219,7 @@ elif st.session_state.page == " Add Finished Stock":
         if qty.strip() != "":
             with open(FINISHED_FILE, "a") as f:
                 f.write(qty.strip() + "\n")
+                st.rerun()
                 st.write("Items saved successfully")
     if st.button("Main Menu "):
             st.session_state.page = "menu"
