@@ -229,7 +229,7 @@ elif st.session_state.page == "Add Finished Stock":
             if finish_item.strip() != "":
                 with open("Finished_Items.txt", "a") as f:
                     f.write(finish_item.strip() + "\n")
-                st.success(f"'{finish_item.strip()}' saved successfully!")
+                    st.success(f"'{finish_item.strip()}' saved successfully!")
                 st.session_state.finished_key += 1
                 st.rerun()
             else:
