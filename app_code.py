@@ -223,8 +223,7 @@ elif st.session_state.page == "Add Finished Stock":
                 with open(FINISHED_FILE, "a") as f:
                     f.write(qty.strip() + "\n")
                 st.success(f"'{qty.strip()}' saved successfully!")
-                st.session_state.current_finished_item = ""
-                st.rerun()
+                st.session.state["finished_item_input"] = ""
             else:
                 st.warning("Please write an item name before saving.")
 
