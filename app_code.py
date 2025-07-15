@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import os
+import pickle
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 
@@ -24,7 +25,9 @@ elif st.session_state.page == "menu":
         elif st.button("🚫 Add Finished Item", key="add_finish_button"):
             st.session_state.page = " Add Finished Stock"
             st.rerun()
-        st.button("📈Add new items in inventory list", key="add_item_button")
+        elif st.button("📈Add new items in inventory list", key="add_item_button"):
+            st.session_state.page = "Add Inventory Items"
+            st.rerun()
     with col2:
         st.button("🛒 Make New Order", key="new_order_button")
         st.button("⚠️ Check Low Stock", key="low_stock_button")
@@ -210,19 +213,18 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-elif st.session_state.page == "Add Finished Stock":
-    st.title("Add Finished Items")
+elif st.session_state.page == " Add Finished Stock"
+    st.title("Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
-    
     FINISHED_FILE = "Finished Items.txt"
-    qty = st.text_input("Write the name of item:", key="finished_item_input")
+    finish_item = st.text_input("Write the name of item:", key="finished_item_input")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("💾 Save & Add Another"):
-            if qty.strip() != "":
+            if finish_item.strip() != "":
                 with open(FINISHED_FILE, "a") as f:
-                    f.write(qty.strip() + "\n")
-                st.success(f"'{qty.strip()}' saved successfully!")
+                    f.write(finish_item.strip() + "\n")
+                st.success(f"'{finish_item.strip()}' saved successfully!")
                 st.session.state["finished_item_input"] = ""
             else:
                 st.warning("Please write an item name before saving.")
@@ -231,11 +233,34 @@ elif st.session_state.page == "Add Finished Stock":
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
             st.rerun
+elif  st.session_state.page == "Add Inventory Items"
+    st.title("New Inventory Items")
+    st.title("Please write the name of items that are new in stock. Please do not try to re-add the name of items already in Inventory List.")
+    new_item = st.text_input("Enter new item name:", key="new_inventory_item")
+    INVENTORY_FILE = "inventory_items_dict.pkl"
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("💾 Save & Add Another"):
+            if new_item.strip() != "":
+                item_clean = new_item.strip().capitalize()
+                if item_clean in inventory:
+                    st.error(f"'{item_clean}' already exists in the inventory.")
+                else:
+                    inventory[item_clean] = {"name": item_clean, "image": "none"}
+                    with open(INVENTORY_FILE, "wb") as f:
+                        pickle.dump(inventory, f)
+
+                    st.success(f"'{item_clean}' added to inventory with no image.")
+                    st.session_state["new_inventory_item"] = ""  # clear box
+                    st.rerun()
+        else:
+            st.warning("Please enter an item name.")
 
 
-
-
-
+    with col2:
+        if st.button("🏡 Main Menu"):
+            st.session_state.page = "menu"
+            st.rerun
 
 
 
