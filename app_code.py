@@ -210,29 +210,32 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
     else:
         st.write("No quantities collected yet.")
 
-
 elif st.session_state.page == "Add Finished Stock":
     st.title("📦 Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
 
-    if "finished_key" not in st.session_state:
-        st.session_state.finished_key = 0
+    FINISHED_FILE = "Finished_Items.txt"
 
-    finish_item = st.text_input("Write the name of item:", key=f"finished_input_{st.session_state.finished_key}")
+    if "finished_items" not in st.session_state:
+        st.session_state.finished_items = []
+
+    finish_item = st.text_input("Write the name of item:", key="finished_input")
 
     col1, col2 = st.columns(2)
 
     with col1:
         if st.button("💾 Save & Add Another"):
-            if finish_item.strip() != "":
-                with open("Finished_Items.txt", "a") as f:
-                    f.write(finish_item.strip() + "\n")
-                    st.success(f"'{finish_item.strip()}' saved successfully!")
-                    st.session_state.finished_key += 1
-                    st.rerun()
+            item_clean = finish_item.strip()
+            if item_clean:
+                try:
+                    with open(FINISHED_FILE, "a") as f:
+                        f.write(item_clean + "\n")
+                    st.success(f"'{item_clean}' saved successfully!")
+                    st.session_state.finished_items.append(item_clean)
+                except Exception as e:
+                    st.error(f"Error saving item: {e}")
             else:
                 st.warning("Please write an item name before saving.")
-
     with col2:
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
