@@ -213,7 +213,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-elif st.session_state.page == " Add Finished Stock"
+elif st.session_state.page == " Add Finished Stock":
     st.title("Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
     FINISHED_FILE = "Finished Items.txt"
@@ -233,7 +233,7 @@ elif st.session_state.page == " Add Finished Stock"
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
             st.rerun
-elif  st.session_state.page == "Add Inventory Items"
+elif  st.session_state.page == "Add Inventory Items":
     st.title("New Inventory Items")
     st.title("Please write the name of items that are new in stock. Please do not try to re-add the name of items already in Inventory List.")
     new_item = st.text_input("Enter new item name:", key="new_inventory_item")
