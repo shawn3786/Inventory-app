@@ -215,14 +215,14 @@ elif st.session_state.page == " Add Finished Stock":
     st.title("Please Write the Name of items Which you are thinking its going to be finished")
     qty = st.text_input("Write the name of items:", key="finished_item_input")
     FINISHED_FILE = "Finished Items.txt"
-   if st.button("💾 Save & Next"):
-            if new_item.strip() != "":
-                with open(FINISHED_FILE, "a") as f:
-                    f.write(new_item.strip() + "\n")
-                st.success(f"'{new_item.strip()}' saved.")
-                st.rerun()  # ⬅️ Use this now
-            else:
-                st.warning("Please write something before saving.")
+    if st.button("💾 Save & Next"):
+        if new_item.strip() != "":
+             with open(FINISHED_FILE, "a") as f:
+                f.write(new_item.strip() + "\n")
+             st.success(f"'{new_item.strip()}' saved.")
+             st.rerun()  # ⬅️ Use this now
+        else:
+             st.warning("Please write something before saving.")
     if st.button("Main Menu "):
         st.session_state.page = "menu"
 
