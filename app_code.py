@@ -21,7 +21,7 @@ elif st.session_state.page == "menu":
         if st.button("📦Start Inventory", key="start_invr_button"):
             st.session_state.page = "inventory" # Corrected assignment
             st.rerun()
-        if st.button("🚫 Add Finished Item", key="add_finish_button"):
+        elif st.button("🚫 Add Finished Item", key="add_finish_button"):
             st.session_state.page = " Add Finished Stock"
             st.rerun
         st.button("📈Add new items in inventory list", key="add_item_button")
@@ -219,7 +219,6 @@ elif st.session_state.page == " Add Finished Stock":
         if qty.strip() != "":
             with open(FINISHED_FILE, "a") as f:
                 f.write(qty.strip() + "\n")
-                st.rerun()
                 st.write("Items saved successfully")
     if st.button("Main Menu "):
             st.session_state.page = "menu"
