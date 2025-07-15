@@ -210,23 +210,19 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-
 elif st.session_state.page == "Add Finished Stock":
-    st.title("Add Finished Stock Items")
+    st.title("Add Finished Items")
     st.write("Please write the name of items you anticipate will be finished soon.")
-    item_name = st.text_input(
-        "Write the name of the item:",
-        value=st.session_state.current_finished_item,
-        key="finished_item_input"
-    )
+    
     FINISHED_FILE = "Finished Items.txt"
+    qty = st.text_input("Write the name of item:", key="finished_item_input")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("💾 Save & Add Another"):
-            if item_name.strip() != "":
+            if qty.strip() != "":
                 with open(FINISHED_FILE, "a") as f:
-                    f.write(item_name.strip() + "\n")
-                st.success(f"'{item_name.strip()}' saved successfully!")
+                    f.write(qty.strip() + "\n")
+                st.success(f"'{qty.strip()}' saved successfully!")
                 st.session_state.current_finished_item = ""
                 st.rerun
             else:
