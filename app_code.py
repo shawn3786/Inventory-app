@@ -209,71 +209,65 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-
 import streamlit as st
 import os
 import base64
 import requests
 
-# ------------------- USER CONFIGURATION -------------------
-GITHUB_TOKEN = "your_token_here"
-REPO_OWNER = "your_github_username"
-REPO_NAME = "your_repo_name"
+# Load secret token securely
+GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]  # Or use os.getenv("GITHUB_TOKEN")
+REPO_OWNER = "shawn3786"
+REPO_NAME = "inventory-app"
 BRANCH_NAME = "main"
-GITHUB_FILE_PATH = "data/Finished_Items.txt"  # path in GitHub repo
-LOCAL_FILE_PATH = "/tmp/Finished_Items.txt"   # temp local path
-# ----------------------------------------------------------
+GITHUB_FILE_PATH = "data/Finished_Items.txt"  # where file will be saved in repo
+LOCAL_FILE_PATH = "/tmp/Finished_Items.txt"
 
+# UI
 st.title("📦 Save Finished Items to GitHub")
-
-# Input box
 item = st.text_input("Enter finished item name:")
 
-# Save button
 if st.button("💾 Save and Push to GitHub"):
     item_clean = item.strip()
     if not item_clean:
         st.warning("Please enter a valid item.")
     else:
-        # 1. Save locally to /tmp/
         try:
+            # Save locally first
             with open(LOCAL_FILE_PATH, "a") as f:
                 f.write(item_clean + "\n")
-            st.success("✅ Saved locally.")
-        except Exception as e:
-            st.error(f"❌ Error saving locally: {e}")
+            st.success("✅ Item saved locally.")
 
-        # 2. Read file and encode to base64
-        try:
+            # Read & encode content
             with open(LOCAL_FILE_PATH, "r") as f:
                 content = f.read()
             encoded = base64.b64encode(content.encode()).decode()
+
+            # GitHub API URL
+            api_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{GITHUB_FILE_PATH}"
+            headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+            # Get SHA if file already exists
+            sha = None
+            res = requests.get(api_url, headers=headers)
+            if res.status_code == 200:
+                sha = res.json()["sha"]
+
+            # Push to GitHub
+            payload = {
+                "message": "Update finished items",
+                "content": encoded,
+                "branch": BRANCH_NAME
+            }
+            if sha:
+                payload["sha"] = sha
+
+            response = requests.put(api_url, headers=headers, json=payload)
+            if response.status_code in [200, 201]:
+                st.success("🚀 Finished items pushed to GitHub!")
+            else:
+                st.error(f"❌ Push failed: {response.json()}")
         except Exception as e:
-            st.error(f"❌ Error reading local file: {e}")
-
-        # 3. Get current SHA (required for updating existing file)
-        api_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{GITHUB_FILE_PATH}"
-        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-        sha = None
-
-        response = requests.get(api_url, headers=headers)
-        if response.status_code == 200:
-            sha = response.json()["sha"]
-
-        # 4. Push to GitHub
-        payload = {
-            "message": f"Update finished items from app",
-            "content": encoded,
-            "branch": BRANCH_NAME
-        }
-        if sha:
-            payload["sha"] = sha  # Needed if file already exists
-
-        put_response = requests.put(api_url, headers=headers, json=payload)
-        if put_response.status_code in [200, 201]:
-            st.success("🚀 File pushed to GitHub successfully!")
-        else:
-            st.error(f"❌ GitHub push failed: {put_response.json()}")
+            st.error(f"❌ Error: {e}")
 
 # ---------------------- Add New Inventory Item Page ----------------------
 elif st.session_state.page == "Add New Item":
