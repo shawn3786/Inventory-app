@@ -213,18 +213,20 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-elif st.session_state.page == "Add Finished Stock":
-    st.title("Add Finished Stock")
-    st.write("Please write the name of items you anticipate will be finished soon.")
-    
-    FINISHED_FILE = os.path.join(os.getcwd(), "Finished Items.txt")
 
+
+elif st.session_state.page == "Add Finished Stock":
+    st.title("📦 Add Finished Stock")
+    st.write("Please write the name of items you anticipate will be finished soon.")
+
+    FINISHED_FILE = "Finished_Items.txt"
     if "finished_key" not in st.session_state:
         st.session_state.finished_key = 0
 
     finish_item = st.text_input("Write the name of item:", key=f"finished_input_{st.session_state.finished_key}")
 
     col1, col2 = st.columns(2)
+
     with col1:
         if st.button("💾 Save & Add Another"):
             if finish_item.strip() != "":
@@ -240,39 +242,43 @@ elif st.session_state.page == "Add Finished Stock":
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
             st.rerun()
-elif  st.session_state.page == "Add Inventory Items":
-    st.title("New Inventory Items")
-    st.title("Please write the name of items that are new in stock. Please do not try to re-add the name of items already in Inventory List.")
-    new_item = st.text_input("Enter new item name:", key="new_inventory_item")
+
+
+elif st.session_state.page == "Add Inventory Items":
+    st.title("🆕 Add New Inventory Item")
+    st.write("Please write the name of items that are new in stock.")
+    st.warning("⚠️ Do not try to re-add items already in the inventory.")
+
     INVENTORY_FILE = "inventory_items_dict.pkl"
+    if os.path.exists(INVENTORY_FILE):
+        with open(INVENTORY_FILE, "rb") as f:
+            inventory = pickle.load(f)
+    else:
+        inventory = {}
+
+    if "new_item_key" not in st.session_state:
+        st.session_state.new_item_key = 0
+
+    new_item = st.text_input("Enter new item name:", key=f"new_input_{st.session_state.new_item_key}")
+
     col1, col2 = st.columns(2)
+
     with col1:
-        if st.button("💾 Save & Add Another"):
-            if new_item.strip() != "":
-                item_clean = new_item.strip().capitalize()
-                if item_clean in inventory:
-                    st.error(f"'{item_clean}' already exists in the inventory.")
-                else:
-                    inventory[item_clean] = {"name": item_clean, "image": "none"}
-                    with open(INVENTORY_FILE, "wb") as f:
-                        pickle.dump(inventory, f)
-
-                    st.success(f"'{item_clean}' added to inventory with no image.")
-                    st.session_state["new_inventory_item"] = ""  # clear box
-                    st.rerun()
-        else:
-            st.warning("Please enter an item name.")
-
+        if st.button("✅ Save New Item"):
+            item_clean = new_item.strip().capitalize()
+            if item_clean == "":
+                st.warning("Please enter an item name.")
+            elif item_clean in inventory:
+                st.error(f"'{item_clean}' already exists in inventory.")
+            else:
+                inventory[item_clean] = {"name": item_clean, "image": "none"}
+                with open(INVENTORY_FILE, "wb") as f:
+                    pickle.dump(inventory, f)
+                st.success(f"'{item_clean}' added to inventory.")
+                st.session_state.new_item_key += 1
+                st.rerun()
 
     with col2:
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
-
-
-
-
-
-
-
-
-
+            st.rerun()
