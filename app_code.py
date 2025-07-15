@@ -223,7 +223,7 @@ elif st.session_state.page == "Add Finished Stock":
     # Initialize a session state variable to hold the text input's actual value
     if "finished_item_name_input" not in st.session_state:
         st.session_state.finished_item_name_input = ""
-
+    FINISHED_ITEMS_FILE = "Finished_Items.txt"
     finish_item_value = st.text_input(
         "Write the name of item:",
         value=st.session_state.finished_item_name_input, # Link to session state
