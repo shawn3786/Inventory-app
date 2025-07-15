@@ -220,7 +220,7 @@ elif st.session_state.page == " Add Finished Stock":
     if "finished_item_input" not in st.session_state:
         st.session_state["finished_item_input"] = ""
 
-    finish_item = qty = st.text_input("Write the name of item:", key=f"finished_input_{st.session_state.finished_key}")
+    finish_item =  st.text_input("Write the name of item:", key=f"finished_input_{st.session_state.finished_key}")
 
     col1, col2 = st.columns(2)
     with col1:
