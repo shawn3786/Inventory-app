@@ -230,7 +230,6 @@ elif st.session_state.page == "Add Finished Stock":
                     f.write(finish_item.strip() + "\n")
                 st.success(f"'{finish_item.strip()}' saved successfully!")
                 st.session_state.finished_key += 1
-                st.rerun()
             else:
                 st.warning("Please write an item name before saving.")
     with col2:
