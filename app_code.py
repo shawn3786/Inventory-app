@@ -216,7 +216,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
 elif st.session_state.page == " Add Finished Stock":
     st.title("Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
-    FINISHED_FILE = "Finished Items.txt"
+    FINISHED_FILE = os.path.join(os.getcwd(), "Finished Items.txt")
     if "finished_key" not in st.session_state:
         st.session_state.finished_key = 0
     finish_item =  st.text_input("Write the name of item:", key=f"finished_input_{st.session_state.finished_key}")
