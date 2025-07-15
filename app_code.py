@@ -227,7 +227,7 @@ elif st.session_state.page == "Add Finished Stock":
     with col1:
         if st.button("💾 Save & Add Another"):
             if finish_item.strip() != "":
-                with open(Finished_Items.txt, "a") as f:
+                with open("Finished_Items.txt", "a") as f:
                     f.write(finish_item.strip() + "\n")
                 st.success(f"'{finish_item.strip()}' saved successfully!")
                 st.session_state.finished_key += 1
