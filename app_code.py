@@ -264,7 +264,6 @@ elif  st.session_state.page == "Add Inventory Items":
     with col2:
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
-            st.rerun
 
 
 
