@@ -211,11 +211,10 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
         st.write("No quantities collected yet.")
 
 
+
 elif st.session_state.page == "Add Finished Stock":
     st.title("📦 Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
-
-   
 
     if "finished_key" not in st.session_state:
         st.session_state.finished_key = 0
@@ -229,12 +228,11 @@ elif st.session_state.page == "Add Finished Stock":
             if finish_item.strip() != "":
                 with open("Finished_Items.txt", "a") as f:
                     f.write(finish_item.strip() + "\n")
-                    st.success(f"'{finish_item.strip()}' saved successfully!")
+                st.success(f"'{finish_item.strip()}' saved successfully!")
                 st.session_state.finished_key += 1
                 st.rerun()
             else:
                 st.warning("Please write an item name before saving.")
-
     with col2:
         if st.button("🏡 Main Menu"):
             st.session_state.page = "menu"
