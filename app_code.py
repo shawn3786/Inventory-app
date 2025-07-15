@@ -204,7 +204,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
     else:
         st.write("No quantities collected yet.")
 elif st.session_state.page == "New Stock":
-     if 'index' not in st.session_state:
+    if 'index' not in st.session_state:
         st.session_state.index = 0
 
     if 'quantities' not in st.session_state:
