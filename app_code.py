@@ -214,6 +214,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
 elif st.session_state.page == " Add Finished Stock":
     st.title("Please Write the Name of items Which you are thinking its going to be finished")
     qty = st.text_input("Write the name of items:", key="finished_item_input")
+    FINISHED_FILE = "Finished Items.txt"
     with open(FINISHED_FILE, "a") as f:
         f.write(qty)
 
