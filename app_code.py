@@ -189,7 +189,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
                     st.session_state.index -= 1
                     st.rerun()
         with col4:
-            if st.button("Main Menu "):
+            if st.button("🏡 Main Menu "):
                  st.session_state.page = "menu"
 
                 
@@ -210,23 +210,32 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-        
-elif st.session_state.page == " Add Finished Stock":
-    st.title("Please Write the Name of items Which you are thinking its going to be finished")
-    qty = st.text_input("Write the name of items:", key="finished_item_input")
+
+elif st.session_state.page == "Add Finished Stock":
+    st.title("Add Finished Stock Items")
+    st.write("Please write the name of items you anticipate will be finished soon.")
+    item_name = st.text_input(
+        "Write the name of the item:",
+        value=st.session_state.current_finished_item,
+        key="finished_item_input"
+    )
     FINISHED_FILE = "Finished Items.txt"
-    if st.button("💾 Save & Next"):
-        if qty.strip() != "":
-             with open(FINISHED_FILE, "a") as f:
-                f.write(qty.strip() + "\n")
-             st.success(f"'{qty.strip()}' saved.")
-             st.session_state["finished_qty"] = "" 
-        else:
-             st.warning("Please write something before saving.")
-    if st.button("Main Menu "):
-        st.session_state.page = "menu"
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("💾 Save & Add Another"):
+            if item_name.strip() != "":
+                with open(FINISHED_FILE, "a") as f:
+                    f.write(item_name.strip() + "\n")
+                st.success(f"'{item_name.strip()}' saved successfully!")
+                st.session_state.current_finished_item = ""
+                st.rerun
+            else:
+                st.warning("Please write an item name before saving.")
 
-
+    with col2:
+        if st.button("🏡 Main Menu"):
+            st.session_state.page = "menu"
+            st.rerun
 
 
 
