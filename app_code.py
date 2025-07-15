@@ -138,72 +138,135 @@ elif st.session_state.page == "menu":
             st.session_state.page = "New Stock"
             st.rerun()
             
-elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' for consistency
+if st.session_state.page == "inventory":
+    st.title("🧾 Select Inventory Type")
+    if 'inventory_type' not in st.session_state:
+        st.session_state.inventory_type = None
+        st.session_state.kitchen_data = {}
+        st.session_state.store_data = {}
+        st.session_state.inventory_phase = "select"
 
-    if 'index' not in st.session_state:
-        st.session_state.index = 0
-
-    if 'quantities' not in st.session_state:
-        st.session_state.quantities = {}
-
-    if 'skipped' not in st.session_state:
-        st.session_state.skipped = []
-
-    # Ensure we don't go out of bounds if rerun occurs after completion
-    if st.session_state.index < len(inventory_items):
-        current_item_data = inventory_items[st.session_state.index] 
-
-        st.subheader(f"Item: {current_item_data['name']}")
-
-        if current_item_data['image'] and os.path.exists(current_item_data['image']):
-            image = Image.open(current_item_data['image'])
-            st.image(image, width=200)
-        else:
-            st.write("No image found for this item.")
-
-
-        qty = st.text_input("Enter quantity:", key=current_item_data['name'])
-
-        col1, col2, col3, col4= st.columns(4)
-
+    if st.session_state.inventory_phase == "select":
+        col1, col2 = st.columns(2)
         with col1:
-            if st.button("Next"):
-                st.session_state.quantities[current_item_data['name']] = qty
-                st.session_state.index += 1
-                st.rerun() # Rerun to update the item display
-        with col2:
-            if st.button("Skip"):
-                st.session_state.skipped.append(current_item_data['name'])
-                st.session_state.index += 1
+            if st.button("🍳 Start Kitchen Inventory"):
+                st.session_state.inventory_type = "kitchen"
+                st.session_state.inventory_phase = "run"
+                st.session_state.index = 0
+                st.session_state.quantities = {}
+                st.session_state.skipped = []
                 st.rerun()
-        with col3:
-             if st.button("Back"):
-                if st.session_state.index > 0:
+
+        with col2:
+            if st.button("🏪 Start Store Inventory"):
+                st.session_state.inventory_type = "store"
+                st.session_state.inventory_phase = "run"
+                st.session_state.index = 0
+                st.session_state.quantities = {}
+                st.session_state.skipped = []
+                st.rerun()
+
+    elif st.session_state.inventory_phase == "run":
+        if 'index' not in st.session_state:
+            st.session_state.index = 0
+        if 'quantities' not in st.session_state:
+            st.session_state.quantities = {}
+        if 'skipped' not in st.session_state:
+            st.session_state.skipped = []
+
+        if st.session_state.index < len(inventory_items):
+            current_item_data = inventory_items[st.session_state.index]
+            st.subheader(f"Item: {current_item_data['name']}")
+
+            if current_item_data['image'] and os.path.exists(current_item_data['image']):
+                image = Image.open(current_item_data['image'])
+                st.image(image, width=300)
+            else:
+                st.write("No image found for this item.")
+
+            qty = st.text_input("Enter quantity:", key=current_item_data['name'])
+
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                if st.button("Next"):
                     st.session_state.quantities[current_item_data['name']] = qty
-                    st.session_state.index -= 1
+                    st.session_state.index += 1
                     st.rerun()
-        with col4:
-            if st.button("🏡 Main Menu "):
-                 st.session_state.page = "menu"
-                 st.rerun()
+            with col2:
+                if st.button("Skip"):
+                    st.session_state.skipped.append(current_item_data['name'])
+                    st.session_state.index += 1
+                    st.rerun()
+            with col3:
+                if st.button("Back"):
+                    if st.session_state.index > 0:
+                        st.session_state.index -= 1
+                        st.rerun()
+            with col4:
+                if st.button("🏡 Main Menu"):
+                    st.session_state.page = "menu"
+                    st.rerun()
 
+        if st.session_state.index >= len(inventory_items):
+            st.success("✅ Inventory complete!")
 
-    if st.session_state.index >= len(inventory_items):
-        st.success("✅ Inventory complete!")
-        # You might want to add a button here to go to a summary page or back to menu
-        if st.button("Back to Menu"):
-            st.session_state.page = "menu"
-            st.session_state.index = 0 # Reset index for next inventory run
-            st.session_state.quantities = {} # Clear quantities
-            st.session_state.skipped = [] # Clear skipped
+            # Save current inventory type's data
+            if st.session_state.inventory_type == "kitchen":
+                st.session_state.kitchen_data = st.session_state.quantities.copy()
+                st.session_state.inventory_type = "store"
+                st.session_state.index = 0
+                st.session_state.quantities = {}
+                st.session_state.skipped = []
+                st.info("Now starting Store Inventory...")
+                st.rerun()
+            elif st.session_state.inventory_type == "store":
+                st.session_state.store_data = st.session_state.quantities.copy()
+                st.session_state.inventory_phase = "done"
+                st.rerun()
+
+    elif st.session_state.inventory_phase == "done":
+        st.success("🎉 Both inventories completed!")
+
+        final_result = {}
+        for item in inventory_items:
+            name = item['name']
+            kitchen_qty = int(st.session_state.kitchen_data.get(name, 0))
+            store_qty = int(st.session_state.store_data.get(name, 0))
+            final_result[name] = kitchen_qty + store_qty
+
+        st.write("### Combined Inventory Quantities:")
+        for item, qty in final_result.items():
+            st.write(f"- {item}: {qty}")
+
+        def generate_inventory_pdf(data_dict):
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt="Combined Inventory Summary", ln=True, align='C')
+            pdf.ln(10)
+            for item, qty in data_dict.items():
+                pdf.cell(200, 10, txt=f"{item}: {qty}", ln=True)
+            return pdf.output(dest="S").encode("latin-1")
+
+        pdf_data = generate_inventory_pdf(final_result)
+        st.download_button(
+            label="📄 Download Combined Inventory PDF",
+            data=pdf_data,
+            file_name="Combined_Inventory_Summary.pdf",
+            mime="application/pdf"
+        )
+
+        if st.button("🔁 Restart Inventory"):
+            st.session_state.page = "inventory"
+            del st.session_state.inventory_type
+            del st.session_state.kitchen_data
+            del st.session_state.store_data
+            del st.session_state.inventory_phase
+            del st.session_state.index
+            del st.session_state.quantities
+            del st.session_state.skipped
             st.rerun()
 
-    st.write("### Collected Quantities:")
-    if st.session_state.quantities: # Only show if there are quantities collected
-        for item, q in st.session_state.quantities.items():
-            st.write(f"- {item}: {q}")
-    else:
-        st.write("No quantities collected yet.")
 elif st.session_state.page == "New Stock":
 
     # Session state setup
@@ -221,7 +284,7 @@ elif st.session_state.page == "New Stock":
     
         if current_item_data['image'] and os.path.exists(current_item_data['image']):
             image = Image.open(current_item_data['image'])
-            st.image(image, width=200)
+            st.image(image, width=300)
         else:
             st.write("No image found for this item.")
     
