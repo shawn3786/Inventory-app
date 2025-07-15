@@ -213,7 +213,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
 
 
 elif st.session_state.page == "Add Finished Stock":
-   if "page" not in st.session_state:
+    if "page" not in st.session_state:
         st.session_state.page = "Add Finished Stock"  # For testing directly
 
     if "finished_items" not in st.session_state:
