@@ -210,36 +210,70 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
     else:
         st.write("No quantities collected yet.")
 
-elif st.session_state.page == "Add Finished Stock":
-    st.title("📦 Add Finished Stock")
-    st.write("Please write the name of items you anticipate will be finished soon.")
+import streamlit as st
+import os
+import base64
+import requests
 
-    FINISHED_FILE = "Finished_Items.txt"
+# ------------------- USER CONFIGURATION -------------------
+GITHUB_TOKEN = "your_token_here"
+REPO_OWNER = "your_github_username"
+REPO_NAME = "your_repo_name"
+BRANCH_NAME = "main"
+GITHUB_FILE_PATH = "data/Finished_Items.txt"  # path in GitHub repo
+LOCAL_FILE_PATH = "/tmp/Finished_Items.txt"   # temp local path
+# ----------------------------------------------------------
 
-    if "finished_items" not in st.session_state:
-        st.session_state.finished_items = []
+st.title("📦 Save Finished Items to GitHub")
 
-    finish_item = st.text_input("Write the name of item:", key="finished_input")
+# Input box
+item = st.text_input("Enter finished item name:")
 
-    col1, col2 = st.columns(2)
+# Save button
+if st.button("💾 Save and Push to GitHub"):
+    item_clean = item.strip()
+    if not item_clean:
+        st.warning("Please enter a valid item.")
+    else:
+        # 1. Save locally to /tmp/
+        try:
+            with open(LOCAL_FILE_PATH, "a") as f:
+                f.write(item_clean + "\n")
+            st.success("✅ Saved locally.")
+        except Exception as e:
+            st.error(f"❌ Error saving locally: {e}")
 
-    with col1:
-        if st.button("💾 Save & Add Another"):
-            item_clean = finish_item.strip()
-            if item_clean:
-                try:
-                    with open(FINISHED_FILE, "a") as f:
-                        f.write(item_clean + "\n")
-                    st.success(f"'{item_clean}' saved successfully!")
-                    st.session_state.finished_items.append(item_clean)
-                except Exception as e:
-                    st.error(f"Error saving item: {e}")
-            else:
-                st.warning("Please write an item name before saving.")
-    with col2:
-        if st.button("🏡 Main Menu"):
-            st.session_state.page = "menu"
-            st.rerun()
+        # 2. Read file and encode to base64
+        try:
+            with open(LOCAL_FILE_PATH, "r") as f:
+                content = f.read()
+            encoded = base64.b64encode(content.encode()).decode()
+        except Exception as e:
+            st.error(f"❌ Error reading local file: {e}")
+
+        # 3. Get current SHA (required for updating existing file)
+        api_url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{GITHUB_FILE_PATH}"
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        sha = None
+
+        response = requests.get(api_url, headers=headers)
+        if response.status_code == 200:
+            sha = response.json()["sha"]
+
+        # 4. Push to GitHub
+        payload = {
+            "message": f"Update finished items from app",
+            "content": encoded,
+            "branch": BRANCH_NAME
+        }
+        if sha:
+            payload["sha"] = sha  # Needed if file already exists
+
+        put_response = requests.put(api_url, headers=headers, json=payload)
+        if put_response.status_code in [200, 201]:
+            st.success("🚀 File pushed to GitHub successfully!")
+        else:
+            st.error(f"❌ GitHub push failed: {put_response.json()}")
 
 # ---------------------- Add New Inventory Item Page ----------------------
 elif st.session_state.page == "Add New Item":
