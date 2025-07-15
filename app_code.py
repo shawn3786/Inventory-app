@@ -217,7 +217,7 @@ elif st.session_state.page == " Add Finished Stock":
     st.title("Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
     FINISHED_FILE = "Finished Items.txt"
-     if "finished_item_input" not in st.session_state:
+    if "finished_item_input" not in st.session_state:
         st.session_state["finished_item_input"] = ""
 
     qty = st.text_input("Write the name of item:", value=st.session_state["finished_item_input"], key="finished_item_input")
