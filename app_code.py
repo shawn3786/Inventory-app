@@ -213,7 +213,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
             st.write(f"- {item}: {q}")
     else:
         st.write("No quantities collected yet.")
-elif st.session_state.page == "Add Finished Stock"
+elif st.session_state.page == "Add Finished Stock":
     st.title("Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
     
