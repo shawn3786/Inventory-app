@@ -194,7 +194,7 @@ elif st.session_state.page == "inventory": # Changed to lowercase 'inventory' fo
         with col4:
             if st.button("🏡 Main Menu "):
                  st.session_state.page = "menu"
-
+                 st.rerun()
                 
 
     if st.session_state.index >= len(inventory_items):
