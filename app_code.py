@@ -220,7 +220,7 @@ elif st.session_state.page == " Add Finished Stock":
     if "finished_item_input" not in st.session_state:
         st.session_state["finished_item_input"] = ""
 
-    finish_item = st.text_input("Write the name of item:", value=st.session_state["finished_item_input"], key="finished_item_input")
+    finish_item = st.text_input("Write the name of item:", key="finished_item_input")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("💾 Save & Add Another"):
@@ -228,7 +228,7 @@ elif st.session_state.page == " Add Finished Stock":
                 with open(FINISHED_FILE, "a") as f:
                     f.write(finish_item.strip() + "\n")
                 st.success(f"'{finish_item.strip()}' saved successfully!")
-                st.session_state["finished_item_input"] = ""
+                st.session_state.finished_item_input = ""
                 rerun()
             else:
                 st.warning("Please write an item name before saving.")
