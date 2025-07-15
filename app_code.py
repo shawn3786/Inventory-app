@@ -215,7 +215,7 @@ elif st.session_state.page == "Add Finished Stock":
     st.title("📦 Add Finished Stock")
     st.write("Please write the name of items you anticipate will be finished soon.")
 
-    FINISHED_FILE = "Finished_Items.txt"
+   
 
     if "finished_key" not in st.session_state:
         st.session_state.finished_key = 0
@@ -227,7 +227,7 @@ elif st.session_state.page == "Add Finished Stock":
     with col1:
         if st.button("💾 Save & Add Another"):
             if finish_item.strip() != "":
-                with open(FINISHED_FILE, "a") as f:
+                with open(Finished_Items.txt, "a") as f:
                     f.write(finish_item.strip() + "\n")
                 st.success(f"'{finish_item.strip()}' saved successfully!")
                 st.session_state.finished_key += 1
