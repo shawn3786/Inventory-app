@@ -138,72 +138,62 @@ elif st.session_state.page == "menu":
             st.session_state.page = "New Stock"
             st.rerun()
 
-elif  st.session_state.page == "inventory":
+elif  st.session_state.page == "import streamlit as st
+
+
+# Kitchen will only update a subset of the store items
+    kitchen_item_names = ["Wings", "Filets", "Fries"]
+    kitchen_inventory_items = [item for item in inventory_items if item["name"] in kitchen_item_names]
+
+# Initialize state
     if "phase" not in st.session_state:
-        st.session_state.phase = "store"  # phases: store -> kitchen -> done
-        st.session_state.store_data = {}
+        st.session_state.phase = "kitchen"  # Start directly from kitchen
+        # Pre-filled from previous store phase
         st.session_state.kitchen_data = {}
         st.session_state.index = 0
 
-        st.title("🧾 Inventory System (Store ➡ Kitchen ➡ Final)")
+    st.title("🍳 Kitchen Inventory Update")
 
-    if st.session_state.phase in ["store", "kitchen"]:
-        phase_label = "🏪 Store Inventory" if st.session_state.phase == "store" else "🍳 Kitchen Inventory"
-        st.header(phase_label)
-
-        if st.session_state.index < len(inventory_items):
-            current = inventory_items[st.session_state.index]
+    if st.session_state.phase == "kitchen":
+        if st.session_state.index < len(kitchen_inventory_items):
+            current = kitchen_inventory_items[st.session_state.index]
             st.subheader(f"Item: {current['name']}")
 
             if current['image'] and os.path.exists(current['image']):
-                st.image(Image.open(current['image']), width=250)
+                 st.image(Image.open(current['image']), width=250)
             else:
-                st.write("No image found.")
+                 st.write("No image found.")
 
-            key_prefix = "store_" if st.session_state.phase == "store" else "kitchen_"
-            prev_value = ""
-            if st.session_state.phase == "kitchen":
-                prev_value = st.session_state.store_data.get(current['name'], "")
-                st.info(f"Previously in store: {prev_value}")
+            prev_value = st.session_state.store_data.get(current['name'], "")
+            st.info(f"Previous value from store: {prev_value}")
 
-            value = st.text_input("Enter quantity (you can write '10 box', '3 piece', etc.):", key=key_prefix + current['name'])
+            value = st.text_input("Update quantity (e.g., '12 box', '8 piece'):", key="kitchen_" + current['name'])
 
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("Next"):
-                    if st.session_state.phase == "store":
-                        st.session_state.store_data[current['name']] = value
-                    else:
-                        st.session_state.kitchen_data[current['name']] = value
+                    st.session_state.store_data[current['name']] = value  # Overwrite with updated kitchen value
                     st.session_state.index += 1
                     st.rerun()
 
             with col2:
                 if st.button("Back") and st.session_state.index > 0:
-                   st.session_state.index -= 1
-                   st.rerun()
+                    st.session_state.index -= 1
+                    st.rerun()
 
-        else:
-            if st.session_state.phase == "store":
-                st.success("✅ Store Inventory Completed. Starting Kitchen Inventory...")
-                st.session_state.phase = "kitchen"
-                st.session_state.index = 0
-                st.rerun()
-            else:
-                st.success("🎉 Kitchen Inventory Completed. Generating Final Result...")
-                st.session_state.phase = "done"
-                st.rerun()
+     else:
+            st.success("🎉 Kitchen Inventory Completed. Showing Final Updated Inventory...")
+            st.session_state.phase = "done"
+            st.rerun()
+     elif st.session_state.phase == "done":
+         st.header("📦 Final Updated Inventory")
 
-    elif st.session_state.phase == "done":
-        st.header("📦 Final Combined Inventory")
-
-        for item in inventory_items:
+         for item in store_inventory_items:
              name = item['name']
-             store_val = st.session_state.store_data.get(name, "")
-             kitchen_val = st.session_state.kitchen_data.get(name, "")
-             st.write(f"**{name}**\n- Store: {store_val}\n- Kitchen: {kitchen_val}")
+             final_val = st.session_state.store_data.get(name, "")
+             st.write(f"**{name}**: {final_val}")
 
-        if st.button("🔁 Restart Inventory"):
+         if st.button("🔁 Restart Inventory"):
             del st.session_state.phase
             del st.session_state.store_data
             del st.session_state.kitchen_data
@@ -211,7 +201,8 @@ elif  st.session_state.page == "inventory":
             st.rerun()
 
 
-        def generate_inventory_pdf(data_dict):
+
+         def generate_inventory_pdf(data_dict):
             pdf = FPDF()
             pdf.add_page()
             pdf.set_font("Arial", size=12)
