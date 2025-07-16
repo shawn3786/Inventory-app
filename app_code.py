@@ -139,9 +139,10 @@ elif st.session_state.page == "menu":
             st.rerun()
 
 elif  st.session_state.page == "inventory":
-    store_inventory_items = [{"name": name, "image": img} for name, img in inventory_items.items()]
+    store_inventory_items = inventory_items.copy()
     kitchen_item_names = ["Wings", "Filets", "Fries"]
     kitchen_inventory_items = [item for item in store_inventory_items if item["name"] in kitchen_item_names]
+
 
 # --- Initialize session state ---
     if "phase" not in st.session_state:
