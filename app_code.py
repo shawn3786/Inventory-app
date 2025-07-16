@@ -138,7 +138,7 @@ elif st.session_state.page == "menu":
             st.session_state.page = "New Stock"
             st.rerun()
 
-elif  st.session_state.page == "import streamlit as st
+elif  st.session_state.page == "inventory":
 
 
 # Kitchen will only update a subset of the store items
@@ -153,7 +153,6 @@ elif  st.session_state.page == "import streamlit as st
         st.session_state.index = 0
 
     st.title("🍳 Kitchen Inventory Update")
-
     if st.session_state.phase == "kitchen":
         if st.session_state.index < len(kitchen_inventory_items):
             current = kitchen_inventory_items[st.session_state.index]
@@ -180,12 +179,11 @@ elif  st.session_state.page == "import streamlit as st
                 if st.button("Back") and st.session_state.index > 0:
                     st.session_state.index -= 1
                     st.rerun()
-
-     else:
+    else:
             st.success("🎉 Kitchen Inventory Completed. Showing Final Updated Inventory...")
             st.session_state.phase = "done"
             st.rerun()
-     elif st.session_state.phase == "done":
+    elif st.session_state.phase == "done":
          st.header("📦 Final Updated Inventory")
 
          for item in store_inventory_items:
