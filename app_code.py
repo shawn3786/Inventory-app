@@ -179,7 +179,8 @@ elif  st.session_state.page == "inventory":
                     st.rerun()
             with col3:
                 if st.button("Skip"):
-                    st.session_state.skipped.append(item['name'])  # ✅ use correct item
+                    st.session_state.skipped.append(item['name'])  # safe now
+  # ✅ use correct item
 
                     st.session_state.index += 1
                     st.rerun()
