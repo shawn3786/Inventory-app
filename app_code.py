@@ -138,7 +138,7 @@ elif st.session_state.page == "menu":
             st.session_state.page = "New Stock"
             st.rerun()
 
-elif  st.session_state.page == "inventory"
+elif  st.session_state.page == "inventory":
     if "phase" not in st.session_state:
         st.session_state.phase = "store"  # phases: store -> kitchen -> done
         st.session_state.store_data = {}
