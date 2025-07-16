@@ -176,6 +176,15 @@ elif  st.session_state.page == "inventory":
                 if st.button("Back", key=f"kitchen_back_{item['name']}") and st.session_state.index > 0:
                     st.session_state.index -= 1
                     st.rerun()
+            with col3:
+                if st.button("Skip"):
+                    st.session_state.skipped.append(current_item_data['name'])
+                    st.session_state.index += 1
+                    st.rerun()
+            with col4:
+                if st.button("🏡 Main Menu"):
+                    st.session_state.page = "menu"
+                    st.rerun()
         else:
             st.success("✅ Kitchen inventory complete. Now continue with store inventory...")
             st.session_state.phase = "store"
@@ -208,6 +217,15 @@ elif  st.session_state.page == "inventory":
             with col2:
                 if st.button("Back", key=f"store_back_{name}") and st.session_state.index > 0:
                     st.session_state.index -= 1
+                    st.rerun()
+            with col3:
+                if st.button("Skip"):
+                    st.session_state.skipped.append(current_item_data['name'])
+                    st.session_state.index += 1
+                    st.rerun()
+            with col4:
+                if st.button("🏡 Main Menu"):
+                    st.session_state.page = "menu"
                     st.rerun()
         else:
             st.success("🎉 All inventory completed. Showing final result...")
