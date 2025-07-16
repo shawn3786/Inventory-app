@@ -151,6 +151,7 @@ elif  st.session_state.page == "inventory":
         st.session_state.kitchen_data = {}  # to store kitchen quantities
         st.session_state.store_data = {}    # to store final store quantities
         st.session_state.index = 0
+        st.session_state.skipped = []
 
     st.title("📋 Inventory App")
 
@@ -178,7 +179,8 @@ elif  st.session_state.page == "inventory":
                     st.rerun()
             with col3:
                 if st.button("Skip"):
-                    st.session_state.skipped.append(current_item_data['name'])
+                    st.session_state.skipped.append(item['name'])  # ✅ use correct item
+
                     st.session_state.index += 1
                     st.rerun()
             with col4:
@@ -222,7 +224,8 @@ elif  st.session_state.page == "inventory":
                 if st.button("Skip"):
                     if "skipped" not in st.session_state:
                          st.session_state.skipped = []
-                    st.session_state.skipped.append(current_item_data['name'])
+                    st.session_state.skipped.append(name)  # ✅ name = item['name'] is already defined above
+✅ use correct item
                     st.session_state.index += 1
                     st.rerun()
             with col4:
