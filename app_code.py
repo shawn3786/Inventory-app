@@ -183,7 +183,7 @@ elif  st.session_state.page == "inventory":
             st.success("🎉 Kitchen Inventory Completed. Showing Final Updated Inventory...")
             st.session_state.phase = "done"
             st.rerun()
-    elif st.session_state.phase == "done":
+   if "phase" in st.session_state and st.session_state.phase == "done":
          st.header("📦 Final Updated Inventory")
 
          for item in store_inventory_items:
