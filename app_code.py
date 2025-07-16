@@ -198,37 +198,6 @@ elif  st.session_state.page == "inventory":
             del st.session_state.index
             st.rerun()
 
-
-
-         def generate_inventory_pdf(data_dict):
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            pdf.cell(200, 10, txt="Combined Inventory Summary", ln=True, align='C')
-            pdf.ln(10)
-            for item, qty in data_dict.items():
-                pdf.cell(200, 10, txt=f"{item}: {qty}", ln=True)
-            return pdf.output(dest="S").encode("latin-1")
-
-        pdf_data = generate_inventory_pdf(final_result)
-        st.download_button(
-            label="📄 Download Combined Inventory PDF",
-            data=pdf_data,
-            file_name="Combined_Inventory_Summary.pdf",
-            mime="application/pdf"
-        )
-
-        if st.button("🔁 Restart Inventory"):
-            st.session_state.page = "inventory"
-            del st.session_state.inventory_type
-            del st.session_state.kitchen_data
-            del st.session_state.store_data
-            del st.session_state.inventory_phase
-            del st.session_state.index
-            del st.session_state.quantities
-            del st.session_state.skipped
-            st.rerun()
-
       
 elif st.session_state.page == "New Stock":
 
