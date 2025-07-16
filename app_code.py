@@ -289,7 +289,7 @@ elif st.session_state.page == "New Stock":
     
     # When all items are done
     if st.session_state.index >= len(inventory_items):
-        st.success("✅ Inventory complete!")
+        st.success("📦🛒🛍️ List is ready for order New Items. Best Luck!")
     
         if st.button("Back to Menu"):
             st.session_state.page = "menu"
