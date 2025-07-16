@@ -207,6 +207,8 @@ elif  st.session_state.page == "inventory":
                  st.info(f"Kitchen quantity previously entered: {prev_kitchen}")
 
             qty = st.text_input("Enter final store quantity:", key="store_" + name)
+            if "skipped" not in st.session_state:
+                st.session_state.skipped = []
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
