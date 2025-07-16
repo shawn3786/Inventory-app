@@ -166,7 +166,7 @@ elif  st.session_state.page == "inventory":
 
             qty = st.text_input("Enter kitchen quantity:", key="kitchen_" + item['name'])
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 if st.button("Next", key=f"kitchen_next_{item['name']}"):
                     st.session_state.kitchen_data[item['name']] = qty
@@ -208,7 +208,7 @@ elif  st.session_state.page == "inventory":
 
             qty = st.text_input("Enter final store quantity:", key="store_" + name)
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 if st.button("Next", key=f"store_next_{name}"):
                     st.session_state.store_data[name] = qty
