@@ -140,7 +140,7 @@ elif st.session_state.page == "menu":
 
 elif  st.session_state.page == "inventory":
     store_inventory_items = [{"name": name, "image": img} for name, img in all_inventory_dict.items()]
-    kitchen_item_names = ["Tomatoes", "Onions", "Garlic"]
+    kitchen_item_names = ["Wings", "Fielts", "Fries"]
     kitchen_inventory_items = [item for item in store_inventory_items if item["name"] in kitchen_item_names]
 
 # --- Initialize session state ---
