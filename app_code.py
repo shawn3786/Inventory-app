@@ -147,10 +147,13 @@ elif  st.session_state.page == "inventory":
 
 # Initialize state
     if "phase" not in st.session_state:
-        st.session_state.phase = "kitchen"  # Start directly from kitchen
-        # Pre-filled from previous store phase
-        st.session_state.kitchen_data = {}
-        st.session_state.index = 0
+         st.session_state.phase = "kitchen"  # Start directly from kitchen phase
+    if "store_data" not in st.session_state:
+         st.session_state.store_data = {}
+    if "kitchen_data" not in st.session_state:
+         st.session_state.kitchen_data = {}
+    if "index" not in st.session_state:
+         st.session_state.index = 0
 
     st.title("🍳 Kitchen Inventory Update")
     if st.session_state.phase == "kitchen":
