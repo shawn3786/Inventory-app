@@ -137,106 +137,79 @@ elif st.session_state.page == "menu":
         if st.button("🛒 Make New Order", key="new_order_button"):
             st.session_state.page = "New Stock"
             st.rerun()
-            
-elif st.session_state.page == "inventory":
-    st.title("🧾 Select Inventory Type")
-    if 'inventory_type' not in st.session_state:
-        st.session_state.inventory_type = None
-        st.session_state.kitchen_data = {}
+
+elif  st.session_state.page == "inventory"
+    if "phase" not in st.session_state:
+        st.session_state.phase = "store"  # phases: store -> kitchen -> done
         st.session_state.store_data = {}
-        st.session_state.inventory_phase = "select"
+        st.session_state.kitchen_data = {}
+        st.session_state.index = 0
 
-    if st.session_state.inventory_phase == "select":
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("🍳 Start Kitchen Inventory"):
-                st.session_state.inventory_type = "kitchen"
-                st.session_state.inventory_phase = "run"
-                st.session_state.index = 0
-                st.session_state.quantities = {}
-                st.session_state.skipped = []
-                st.rerun()
+        st.title("🧾 Inventory System (Store ➡ Kitchen ➡ Final)")
 
-        with col2:
-            if st.button("🏪 Start Store Inventory"):
-                st.session_state.inventory_type = "store"
-                st.session_state.inventory_phase = "run"
-                st.session_state.index = 0
-                st.session_state.quantities = {}
-                st.session_state.skipped = []
-                st.rerun()
-
-    elif st.session_state.inventory_phase == "run":
-        if 'index' not in st.session_state:
-            st.session_state.index = 0
-        if 'quantities' not in st.session_state:
-            st.session_state.quantities = {}
-        if 'skipped' not in st.session_state:
-            st.session_state.skipped = []
+    if st.session_state.phase in ["store", "kitchen"]:
+        phase_label = "🏪 Store Inventory" if st.session_state.phase == "store" else "🍳 Kitchen Inventory"
+        st.header(phase_label)
 
         if st.session_state.index < len(inventory_items):
-            current_item_data = inventory_items[st.session_state.index]
-            st.subheader(f"Item: {current_item_data['name']}")
+            current = inventory_items[st.session_state.index]
+            st.subheader(f"Item: {current['name']}")
 
-            if current_item_data['image'] and os.path.exists(current_item_data['image']):
-                image = Image.open(current_item_data['image'])
-                st.image(image, width=300)
+            if current['image'] and os.path.exists(current['image']):
+                st.image(Image.open(current['image']), width=250)
             else:
-                st.write("No image found for this item.")
+                st.write("No image found.")
 
-            qty = st.text_input("Enter quantity:", key=current_item_data['name'])
+            key_prefix = "store_" if st.session_state.phase == "store" else "kitchen_"
+            prev_value = ""
+            if st.session_state.phase == "kitchen":
+                prev_value = st.session_state.store_data.get(current['name'], "")
+                st.info(f"Previously in store: {prev_value}")
 
-            col1, col2, col3, col4 = st.columns(4)
+            value = st.text_input("Enter quantity (you can write '10 box', '3 piece', etc.):", key=key_prefix + current['name'])
+
+            col1, col2 = st.columns(2)
             with col1:
                 if st.button("Next"):
-                    st.session_state.quantities[current_item_data['name']] = qty
+                    if st.session_state.phase == "store":
+                        st.session_state.store_data[current['name']] = value
+                    else:
+                        st.session_state.kitchen_data[current['name']] = value
                     st.session_state.index += 1
                     st.rerun()
+
             with col2:
-                if st.button("Skip"):
-                    st.session_state.skipped.append(current_item_data['name'])
-                    st.session_state.index += 1
-                    st.rerun()
-            with col3:
-                if st.button("Back"):
-                    if st.session_state.index > 0:
-                        st.session_state.index -= 1
-                        st.rerun()
-            with col4:
-                if st.button("🏡 Main Menu"):
-                    st.session_state.page = "menu"
-                    st.rerun()
+                if st.button("Back") and st.session_state.index > 0:
+                   st.session_state.index -= 1
+                   st.rerun()
 
-        if st.session_state.index >= len(inventory_items):
-            st.success("✅ Inventory complete!")
-
-            # Save current inventory type's data
-            if st.session_state.inventory_type == "kitchen":
-                st.session_state.kitchen_data = st.session_state.quantities.copy()
-                st.session_state.inventory_type = "store"
+        else:
+            if st.session_state.phase == "store":
+                st.success("✅ Store Inventory Completed. Starting Kitchen Inventory...")
+                st.session_state.phase = "kitchen"
                 st.session_state.index = 0
-                st.session_state.quantities = {}
-                st.session_state.skipped = []
-                st.info("Now starting Store Inventory...")
                 st.rerun()
-            elif st.session_state.inventory_type == "store":
-                st.session_state.store_data = st.session_state.quantities.copy()
-                st.session_state.inventory_phase = "done"
+            else:
+                st.success("🎉 Kitchen Inventory Completed. Generating Final Result...")
+                st.session_state.phase = "done"
                 st.rerun()
 
-    elif st.session_state.inventory_phase == "done":
-        st.success("🎉 Both inventories completed!")
+    elif st.session_state.phase == "done":
+        st.header("📦 Final Combined Inventory")
 
-        final_result = {}
         for item in inventory_items:
-            name = item['name']
-            kitchen_qty = int(st.session_state.kitchen_data.get(name, 0))
-            store_qty = int(st.session_state.store_data.get(name, 0))
-            final_result[name] = kitchen_qty + store_qty
+             name = item['name']
+             store_val = st.session_state.store_data.get(name, "")
+             kitchen_val = st.session_state.kitchen_data.get(name, "")
+             st.write(f"**{name}**\n- Store: {store_val}\n- Kitchen: {kitchen_val}")
 
-        st.write("### Combined Inventory Quantities:")
-        for item, qty in final_result.items():
-            st.write(f"- {item}: {qty}")
+        if st.button("🔁 Restart Inventory"):
+            del st.session_state.phase
+            del st.session_state.store_data
+            del st.session_state.kitchen_data
+            del st.session_state.index
+            st.rerun()
+
 
         def generate_inventory_pdf(data_dict):
             pdf = FPDF()
