@@ -115,7 +115,8 @@ inventory_items = [
 {"name": "Chocolate Frappe Base", "image":"Chocolate Frappe Base.jpg"},
 {"name": "Vanila Frappe Base", "image":"Vanila Frappe Base.jpg"},
 {"name": "Disposable fork", "image":"disposable fork.jpg"},
-{"name": "Brownie Box paper", "image":"Small Bucket Paper.jpg"}
+{"name": "Brownie Box paper", "image":"Small Bucket Paper.jpg"},
+{"name": "Glass Cleaner", "image":"Glass Cleaner.jpg"}
     ]
 store_inventory_items = inventory_items.copy()
 kitchen_item_names = item_names = ["Wings", "Filets", "Fries", "Burger Buns", "Potato Pops", "Onion Rings", "chicken Nugets Pops", "Chili Cheese Nugets", "Becons", "Churros", "Brownies", "Choclate Fudge Cookies", "White Macadaima cookies", "Nutella", "Oreo Biscuts", "Guttio", "Dairy Cream", "Dark Chocolate Sauce", "Jalapenos can", "Coleslaw","gurke can",
