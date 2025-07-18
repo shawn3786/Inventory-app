@@ -6,7 +6,7 @@ inventory_items = [
 {"name": "Wings", "image": "Wings.jpg"}, # Example path
 {"name": "Filets", "image": "Filets.jpg"}, # Example path
 {"name": "Fries", "image": "Fries.jpg"},
-{"name": "Burger Buns", "image": "IMG_5032.jpg"}, # No image available
+{"name": "Burger Buns", "image": "Burger Buns.jpg"}, # No image available
 {"name": "Potato Pops", "image": "Potato Pops.jpg"},
 {"name": "Onion Rings", "image":"Onion Rings.jpg" },
 {"name": "chicken Nugets Pops", "image":"Chicken Nugets.jpg"},
