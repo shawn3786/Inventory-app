@@ -225,8 +225,7 @@ elif  st.session_state.page == "inventory":
                 if st.button("Skip"):
                     if "skipped" not in st.session_state:
                          st.session_state.skipped = []
-                    st.session_state.skipped.append(name)  # ✅ name = item['name'] is already defined above
-✅ use correct item
+                    st.session_state.skipped.append(name)  
                     st.session_state.index += 1
                     st.rerun()
             with col4:
