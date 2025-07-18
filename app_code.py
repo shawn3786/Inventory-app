@@ -196,7 +196,7 @@ elif  st.session_state.page == "inventory":
                     st.session_state.page = "menu"
                     st.rerun()
         else:
-            st.success("✅ Kitchen inventory complete. Now continue with store inventory...")
+            st.success("✅ Kitchen inventory complete. Please do not forget to add the kitchen Item value in store items. It will show you in blue line. Now continue with store inventory...")
             st.session_state.phase = "store"
             st.session_state.index = 0
             st.rerun()
@@ -278,9 +278,6 @@ elif  st.session_state.page == "inventory":
             st.rerun()
 
 
-
-
-
     
 elif st.session_state.page == "New Stock":
 
@@ -299,7 +296,7 @@ elif st.session_state.page == "New Stock":
     
         if current_item_data['image'] and os.path.exists(current_item_data['image']):
             image = Image.open(current_item_data['image'])
-            st.image(image, width=300)
+            st.image(image, width=250)
         else:
             st.write("No image found for this item.")
     
