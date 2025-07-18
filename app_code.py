@@ -72,8 +72,8 @@ inventory_items = [
 {"name": "Mango Passion Tea Bottle", "image": "Mango Passion.jpg"},
 {"name": "Popcorn Tea Bottle", "image": "Popcorn Tea.jpg"},
 {"name": "Cinnamon Roll  Tea Bottle", "image": "Cinnamon Roll Tea.jpg"},
-{"name": "Pfirsich Bottle", "image": "Pfirsich Tea.jpg"},
-{"name": "Himbeere Bottle", "image": "Himbeer Tea.jpg"},
+{"name": "Pfirsich Tea Bottle", "image": "Pfirsich Tea.jpg"},
+{"name": "Himbeere Tea Bottle", "image": "Himbeer Tea.jpg"},
 {"name": "Toilet Paper", "image": "Toilet Paper.jpg"},
 {"name": "Tissue Paper", "image": "Tissue Paper.jpg"},
 {"name": "Customer Tissue", "image": "Customer Tissue.jpg"},
@@ -118,7 +118,10 @@ inventory_items = [
 {"name": "Brownie Box paper", "image":"Small Bucket Paper.jpg"}
     ]
 store_inventory_items = inventory_items.copy()
-kitchen_item_names = ["Wings", "Filets", "Fries"]  # You can modify this as needed
+kitchen_item_names = item_names = ["Wings", "Filets", "Fries", "Burger Buns", "Potato Pops", "Onion Rings", "chicken Nugets Pops", "Chili Cheese Nugets", "Becons", "Churros", "Brownies", "Choclate Fudge Cookies", "White Macadaima cookies", "Nutella", "Oreo Biscuts", "Guttio", "Dairy Cream", "Dark Chocolate Sauce", "Jalapenos can", "Coleslaw","gurke can",
+"Rosmery Katchup bottle", "Cheese Sauce Bottle ", "Extra Cheese Sauce Bottle ", "Harisa Sauce Bottle ", " BBQ Becon Sauce Bottle ", "Truffle Sauce Bottle ", "Sweet Jalapenu Sauce", "Harisa Mayo", "Garlic Mayo", "Hot Chili Sauce", "Rosmary Katchup Sauce", "BBQ Sauce", "Truffle Aloi", "white Truffle Flavour", "Garlic Cheese Flavour", "American BBQ Flavour ", "Korean Spice Flavour ", "Salse Jalapeno Flavour", "Sweet Chili Flavour", "Blue Hot Habanero Flavour", "Classic Cheese Tortilla", "Sweet Chili Tortilla", "Oriental Spices Tortilla", "American BBQ Tortilla", "Salsa Jalapeno Tortilla", "Blue Hot Habanero Tortilla", "Milk", "Coca Cola", "Coca Cola Zero", "Sprite", "Fanta", "Mezzo Mix", "Capri Sun Orange", "Fuze Ice Tea", "Fuze Schwarzer Tea", "Red Fruits Tea Bottle", "Mango Passion Tea Bottle", "Popcorn Tea Bottle", "Cinnamon Roll  Tea Bottle", "Pfirsich Tea Bottle", "Himbeere Tea Bottle", "Customer Tissue", "Blue Tissue Roll for Kitchen", "Order Bag", "Wet Wipes", "Yellow Large Bucket", "Yellow Large Bucket Cap", "Red Small Bucket", "Red Small Bucket Cap", "Yellow Glass", "Yellow Glass cap", "Shake Glass", "Shake Glass Cap", "Straw", "Crispy Frie Box", "Extra Cheese sauce small packing", "Brownie Box", "Cleaner&Polish", "Garbge Bag", "Hand Gloves", "Sirafan Speed", "Greasecutter Fast Foam", "Loco Sticker", "Large Bucket Paper", "Tablet Paper", "Small Bucket Paper", "Chocolate Frappe Base", "Vanila Frappe Base", "Disposable fork", "Brownie Box paper"
+]
+
 kitchen_inventory_items = [item for item in store_inventory_items if item["name"] in kitchen_item_names]
 
 if "page" not in st.session_state:
