@@ -159,7 +159,6 @@ elif  st.session_state.page == "inventory":
         st.session_state.kitchen_data = {}  # to store kitchen quantities
         st.session_state.store_data = {}    # to store final store quantities
         st.session_state.index = 0
-        st.session_state.skipped = []
 
     st.title("📋 Inventory App")
 
@@ -175,7 +174,7 @@ elif  st.session_state.page == "inventory":
 
             qty = st.text_input("Enter kitchen quantity:", key="kitchen_" + item['name'])
 
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 if st.button("Next", key=f"kitchen_next_{item['name']}"):
                     st.session_state.kitchen_data[item['name']] = qty
@@ -186,13 +185,6 @@ elif  st.session_state.page == "inventory":
                     st.session_state.index -= 1
                     st.rerun()
             with col3:
-                if st.button("Skip"):
-                    st.session_state.skipped.append(item['name'])  # safe now
-  # ✅ use correct item
-
-                    st.session_state.index += 1
-                    st.rerun()
-            with col4:
                 if st.button("🏡 Main Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
@@ -219,7 +211,7 @@ elif  st.session_state.page == "inventory":
 
             qty = st.text_input("Enter final store quantity:", key="store_" + name)
 
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3, col3 = st.columns(3)
             with col1:
                 if st.button("Next", key=f"store_next_{name}"):
                     st.session_state.store_data[name] = qty
@@ -230,13 +222,6 @@ elif  st.session_state.page == "inventory":
                     st.session_state.index -= 1
                     st.rerun()
             with col3:
-                if st.button("Skip"):
-                    if "skipped" not in st.session_state:
-                         st.session_state.skipped = []
-                    st.session_state.skipped.append(name)  
-                    st.session_state.index += 1
-                    st.rerun()
-            with col4:
                 if st.button("🏡 Main Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
