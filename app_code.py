@@ -189,12 +189,14 @@ elif st.session_state.page == "inventory":
     st.title("📋 Inventory App")
 
     # --- Transition if kitchen is done ---
-    if st.session_state.phase == "kitchen" and st.session_state.index >= len(inventory_items):
+    if st.session_state.index >= len(kitchen_inventory_items):
         st.success("✅ Kitchen inventory complete.")
-        st.session_state.phase = "store"
-        st.session_state.index = 0
-        st.rerun()
-
+        if st.button("👉 Continue to Store Inventory"):
+            st.session_state.phase = "store"
+            st.session_state.index = 0
+            st.rerun()
+    else:
+       # Normal kitchen item input flow here
     if st.session_state.phase == "kitchen":
         st.header("🍳 Step 1: Enter Kitchen Inventory")
         if st.session_state.index < len(inventory_items):
