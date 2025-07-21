@@ -3,6 +3,22 @@ from PIL import Image, ImageDraw, ImageFont
 from fpdf import FPDF
 import os
 import json
+# --- Initialize session state early to avoid attribute errors ---
+if "page" not in st.session_state:
+    st.session_state.page = "welcome"
+if "index" not in st.session_state:
+    st.session_state.index = 0
+if "phase" not in st.session_state:
+    st.session_state.phase = "kitchen"
+if "kitchen_data" not in st.session_state:
+    st.session_state.kitchen_data = {}
+if "store_data" not in st.session_state:
+    st.session_state.store_data = {}
+if "quantities" not in st.session_state:
+    st.session_state.quantities = {}
+if "skipped" not in st.session_state:
+    st.session_state.skipped = []
+
 
 SAVE_FILE = "inventory_progress.json"
 
@@ -166,6 +182,7 @@ elif st.session_state.page == "menu":
 
 elif st.session_state.page == "inventory":
     st.title("📋 Inventory App")
+     # --- Initialize session state early to avoid attribute errors ---
 
     if st.session_state.phase == "kitchen":
         st.header("🍳 Step 1: Enter Kitchen Inventory")
