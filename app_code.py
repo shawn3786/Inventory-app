@@ -187,6 +187,11 @@ elif st.session_state.page == "menu":
 
 elif st.session_state.page == "inventory":
     st.title("📋 Inventory App")
+    if st.session_state.phase == "kitchen" and st.session_state.index >= len(inventory_items):
+        st.success("✅ Kitchen inventory complete.")
+        st.session_state.phase = "store"
+        st.session_state.index = 0
+        st.rerun()
 
     if st.session_state.phase == "kitchen":
         st.header("🍳 Step 1: Enter Kitchen Inventory")
@@ -219,12 +224,7 @@ elif st.session_state.page == "inventory":
                 if st.button("🏡 Main Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
-        else:
-            st.success("✅ Kitchen inventory complete.")
-            st.session_state.phase = "store"
-            st.session_state.index = 0
-            st.rerun()
-
+       
     elif st.session_state.phase == "store":
         st.header("🏬 Step 2: Complete Store Inventory")
         if st.session_state.index < len(inventory_items):
