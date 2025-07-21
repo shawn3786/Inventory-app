@@ -243,7 +243,7 @@ elif st.session_state.page == "New Stock":
         item = inventory_items[st.session_state.order_index]
         st.subheader(f"Item {st.session_state.order_index + 1} of {len(inventory_items)}: {item['name']}")
 
-        image_path = f"resized_for_streamlit/{item['image']}"
+        image_path = item['image']
         if item['image'] and os.path.exists(image_path):
             st.image(image_path, width=250)
         else:
@@ -387,7 +387,7 @@ elif st.session_state.page == "inventory":
             item = kitchen_items[st.session_state.index]
             st.subheader(f"Item {st.session_state.index + 1} of {len(kitchen_items)}: {item['name']}")
 
-            image_path = f"resized_for_streamlit/{item['image']}"
+            image_path = item['image']
             if item['image'] and os.path.exists(image_path):
                 st.image(image_path, width=250)
             else:
@@ -445,7 +445,7 @@ elif st.session_state.page == "inventory":
             name = item['name']
             st.subheader(f"Item {st.session_state.index + 1} of {len(inventory_items)}: {name}")
 
-            image_path = f"resized_for_streamlit/{item['image']}"
+            image_path = item['image']
             if item['image'] and os.path.exists(image_path):
                 st.image(image_path, width=250)
             else:
