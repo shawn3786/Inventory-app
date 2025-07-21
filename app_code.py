@@ -197,36 +197,36 @@ elif st.session_state.page == "inventory":
             st.rerun()
     else:
        # Normal kitchen item input flow here
-    if st.session_state.phase == "kitchen":
-        st.header("🍳 Step 1: Enter Kitchen Inventory")
-        if st.session_state.index < len(inventory_items):
-            item = inventory_items[st.session_state.index]
-            st.subheader(f"Item: {item['name']}")
-            if item['image'] and os.path.exists(item['image']):
-                st.image(item['image'], width=250)
-            qty = st.text_input("Enter quantity:", value=st.session_state.get(item['name'], ""), key=item['name'])
-
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                if st.button("Save & Next"):
-                    st.session_state.kitchen_data[item['name']] = qty
-                    st.session_state.index += 1
-                    save_progress()
-                    st.rerun()
-            with col2:
-                if st.button("Back") and st.session_state.index > 0:
-                    st.session_state.index -= 1
-                    st.rerun()
-            with col3:
-                if st.button("Reset Progress"):
-                    if os.path.exists(SAVE_FILE):
-                        os.remove(SAVE_FILE)
-                    st.session_state.clear()
-                    st.rerun()
-            with col4:
-                if st.button("🏡 Main Menu"):
-                    st.session_state.page = "menu"
-                    st.rerun()
+        if st.session_state.phase == "kitchen":
+            st.header("🍳 Step 1: Enter Kitchen Inventory")
+            if st.session_state.index < len(inventory_items):
+                item = inventory_items[st.session_state.index]
+                st.subheader(f"Item: {item['name']}")
+                if item['image'] and os.path.exists(item['image']):
+                    st.image(item['image'], width=250)
+                qty = st.text_input("Enter quantity:", value=st.session_state.get(item['name'], ""), key=item['name'])
+    
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    if st.button("Save & Next"):
+                        st.session_state.kitchen_data[item['name']] = qty
+                        st.session_state.index += 1
+                        save_progress()
+                        st.rerun()
+                with col2:
+                    if st.button("Back") and st.session_state.index > 0:
+                        st.session_state.index -= 1
+                        st.rerun()
+                with col3:
+                    if st.button("Reset Progress"):
+                        if os.path.exists(SAVE_FILE):
+                            os.remove(SAVE_FILE)
+                        st.session_state.clear()
+                        st.rerun()
+                with col4:
+                    if st.button("🏡 Main Menu"):
+                        st.session_state.page = "menu"
+                        st.rerun()
 
     elif st.session_state.phase == "store":
         st.header("🏬 Step 2: Complete Store Inventory")
