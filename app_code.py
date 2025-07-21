@@ -206,53 +206,28 @@ if st.session_state.page == "welcome":
 # ---------------------- Menu Page ----------------------
 elif st.session_state.page == "menu":
     st.title("📋 What would you like to do?")
-    # Check if there's existing inventory progress
-    has_inventory_progress = os.path.exists(INVENTORY_SAVE_FILE)
     
-    if has_inventory_progress:
-        st.info("📋 Previous inventory progress found!")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("📦 Start Fresh Inventory", key="start_fresh_invr_button"):
-                # Clear the inventory progress file completely when starting fresh
-                if os.path.exists(INVENTORY_SAVE_FILE):
-                    os.remove(INVENTORY_SAVE_FILE)
-                st.session_state.page = "inventory"
-                st.session_state.phase = "kitchen"
-                st.session_state.index = 0
-                # Clear any existing progress
-                st.session_state.kitchen_data = {}
-                st.session_state.store_data = {}
-                save_inventory_progress()
-                st.rerun()
-        with col2:
-            if st.button("🔄 Continue Previous Inventory", key="continue_invr_button"):
-                # Load previous progress and continue
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📦 Start Inventory", key="start_invr_button"):
+            # Check if there's existing inventory progress and auto-load it
+            if os.path.exists(INVENTORY_SAVE_FILE):
                 load_inventory_progress()
-                st.session_state.page = "inventory"
-                st.rerun()
-        with col3:
-            if st.button("🛒 Make New Order", key="new_order_button"):
-                st.session_state.page = "New Stock"
-                st.session_state.order_index = 0
-                st.rerun()
-    else:
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("📦 Start Inventory", key="start_invr_button"):
-                st.session_state.page = "inventory"
+                st.info("🔄 Continuing from previous inventory progress...")
+            else:
+                # Start fresh if no previous progress
                 st.session_state.phase = "kitchen"
                 st.session_state.index = 0
-                # Clear any existing progress
                 st.session_state.kitchen_data = {}
                 st.session_state.store_data = {}
                 save_inventory_progress()
-                st.rerun()
-        with col2:
-            if st.button("🛒 Make New Order", key="new_order_button"):
-                st.session_state.page = "New Stock"
-                st.session_state.order_index = 0
-                st.rerun()
+            st.session_state.page = "inventory"
+            st.rerun()
+    with col2:
+        if st.button("🛒 Make New Order", key="new_order_button"):
+            st.session_state.page = "New Stock"
+            st.session_state.order_index = 0
+            st.rerun()
 
 # ---------------------- New Order Page ----------------------
 elif st.session_state.page == "New Stock":
