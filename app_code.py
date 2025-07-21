@@ -29,10 +29,7 @@ def save_progress():
             "store_data": st.session_state.store_data,
         }, f)
 
-# ✅ Load previous progress if any
-load_progress()
-
-# ✅ Initialize session_state only if not already present
+# ✅ Initialize session_state first, then load progress
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 if "phase" not in st.session_state:
@@ -47,6 +44,9 @@ if "quantities" not in st.session_state:
     st.session_state.quantities = {}
 if "skipped" not in st.session_state:
     st.session_state.skipped = []
+
+# ✅ Load previous progress after initialization
+load_progress()
 inventory_items = [
     {"name": "Wings", "image": "Wings.jpg"},
     {"name": "Filets", "image": "Filets.jpg"},
@@ -178,12 +178,138 @@ elif st.session_state.page == "menu":
             st.session_state.page = "inventory"
             st.session_state.phase = "kitchen"
             st.session_state.index = 0
+            # Clear any existing progress
+            st.session_state.kitchen_data = {}
+            st.session_state.store_data = {}
+            save_progress()
             st.rerun()
     with col2:
         if st.button("🛒 Make New Order", key="new_order_button"):
             st.session_state.page = "New Stock"
             st.session_state.index = 0
             st.rerun()
+
+# ---------------------- New Order Page ----------------------
+elif st.session_state.page == "New Stock":
+    st.header("🛒 New Order - Add Items to Order List")
+    
+    # Initialize order data if not exists
+    if "order_data" not in st.session_state:
+        st.session_state.order_data = {}
+    if "order_index" not in st.session_state:
+        st.session_state.order_index = 0
+    
+    if st.session_state.order_index < len(inventory_items):
+        item = inventory_items[st.session_state.order_index]
+        st.subheader(f"Item {st.session_state.order_index + 1} of {len(inventory_items)}: {item['name']}")
+        
+        image_path = f"resized_for_streamlit/{item['image']}"
+        if item['image'] and os.path.exists(image_path):
+            st.image(image_path, width=250)
+        else:
+            st.warning("📷 Image not found.")
+
+        # Show current order quantity if exists
+        current_qty = st.session_state.order_data.get(item['name'], "")
+        
+        qty = st.text_input(
+            "Enter quantity to order (leave empty to skip):", 
+            value=current_qty,
+            key=f"order_qty_{st.session_state.order_index}"
+        )
+
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            if st.button("Next", key=f"order_next_{st.session_state.order_index}"):
+                if qty.strip():  # Only add to order if quantity is provided
+                    st.session_state.order_data[item['name']] = qty
+                st.session_state.order_index += 1
+                st.rerun()
+        
+        with col2:
+            if st.button("Back", key=f"order_back_{st.session_state.order_index}"):
+                if st.session_state.order_index > 0:
+                    st.session_state.order_index -= 1
+                    st.rerun()
+        
+        with col3:
+            if st.button("Skip Item", key=f"order_skip_{st.session_state.order_index}"):
+                st.session_state.order_index += 1
+                st.rerun()
+        
+        with col4:
+            if st.button("🏡 Main Menu", key=f"order_menu_{st.session_state.order_index}"):
+                st.session_state.page = "menu"
+                st.rerun()
+                
+        # Show progress
+        progress = (st.session_state.order_index / len(inventory_items)) * 100
+        st.progress(progress / 100)
+        st.write(f"Progress: {st.session_state.order_index}/{len(inventory_items)} items ({progress:.1f}%)")
+        
+    else:
+        # Show final order summary
+        st.success("🎉 Order list complete!")
+        st.header("📋 Your Order Summary")
+        
+        if st.session_state.order_data:
+            total_items = 0
+            for item_name, quantity in st.session_state.order_data.items():
+                st.write(f"**{item_name}**: {quantity}")
+                try:
+                    total_items += int(quantity) if quantity.isdigit() else 0
+                except:
+                    pass
+            
+            st.info(f"**Total items to order: {total_items}**")
+            
+            # Generate PDF for order
+            def generate_order_pdf(order_dict):
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                pdf.cell(200, 10, txt="New Stock Order List", ln=True, align='C')
+                pdf.ln(10)
+                
+                total = 0
+                for item, qty in order_dict.items():
+                    pdf.cell(200, 10, txt=f"{item}: {qty}", ln=True)
+                    try:
+                        total += int(qty) if qty.isdigit() else 0
+                    except:
+                        pass
+                
+                pdf.ln(10)
+                pdf.cell(200, 10, txt=f"Total Items: {total}", ln=True)
+                return pdf.output(dest="S").encode("latin-1")
+
+            pdf_bytes = generate_order_pdf(st.session_state.order_data)
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.download_button(
+                    label="📄 Download Order List as PDF",
+                    data=pdf_bytes,
+                    file_name="New_Stock_Order.pdf",
+                    mime="application/pdf"
+                )
+            
+            with col2:
+                if st.button("🔁 Create New Order"):
+                    st.session_state.order_data = {}
+                    st.session_state.order_index = 0
+                    st.rerun()
+            
+            with col3:
+                if st.button("🏡 Back to Menu"):
+                    st.session_state.page = "menu"
+                    st.rerun()
+                    
+        else:
+            st.warning("No items were added to the order.")
+            if st.button("🏡 Back to Menu"):
+                st.session_state.page = "menu"
+                st.rerun()
 
 # ---------------------- Inventory Flow ----------------------
 elif st.session_state.page == "inventory":
@@ -192,42 +318,61 @@ elif st.session_state.page == "inventory":
     if st.session_state.phase == "kitchen":
         st.header("🍳 Step 1: Enter Kitchen Inventory")
         kitchen_items = kitchen_inventory_items
+        
+        # Debug info to see what's happening
+        st.write(f"Debug: Current index: {st.session_state.index}, Total kitchen items: {len(kitchen_items)}")
+        
         if st.session_state.index < len(kitchen_items):
             item = kitchen_items[st.session_state.index]
-            st.subheader(f"Item: {item['name']}")
-            if item['image'] and os.path.exists(item['image']):
-                st.image(item['image'], width=250)
+            st.subheader(f"Item {st.session_state.index + 1} of {len(kitchen_items)}: {item['name']}")
+            
+            image_path = f"resized_for_streamlit/{item['image']}"
+            if item['image'] and os.path.exists(image_path):
+                st.image(image_path, width=250)
             else:
                 st.warning("📷 Image not found.")
 
-            qty = st.text_input("Enter quantity:", value=st.session_state.kitchen_data.get(item['name'], ""), key=item['name'])
+            qty = st.text_input(
+                "Enter quantity:", 
+                value=st.session_state.kitchen_data.get(item['name'], ""), 
+                key=f"kitchen_qty_{st.session_state.index}"
+            )
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                if st.button("Save & Next"):
+                if st.button("Save & Next", key=f"kitchen_next_{st.session_state.index}"):
                     st.session_state.kitchen_data[item['name']] = qty
                     st.session_state.index += 1
                     save_progress()
                     st.rerun()
             with col2:
-                if st.button("Back") and st.session_state.index > 0:
-                    st.session_state.index -= 1
-                    st.rerun()
+                if st.button("Back", key=f"kitchen_back_{st.session_state.index}"):
+                    if st.session_state.index > 0:
+                        st.session_state.index -= 1
+                        save_progress()
+                        st.rerun()
             with col3:
-                if st.button("Reset Progress"):
+                if st.button("Reset Progress", key=f"kitchen_reset_{st.session_state.index}"):
                     if os.path.exists(SAVE_FILE):
                         os.remove(SAVE_FILE)
-                    st.session_state.clear()
+                    # Reset all session state properly
+                    st.session_state.page = "menu"
+                    st.session_state.phase = "kitchen"
+                    st.session_state.index = 0
+                    st.session_state.kitchen_data = {}
+                    st.session_state.store_data = {}
                     st.rerun()
             with col4:
-                if st.button("🏡 Main Menu"):
+                if st.button("🏡 Main Menu", key=f"kitchen_menu_{st.session_state.index}"):
                     st.session_state.page = "menu"
+                    save_progress()
                     st.rerun()
         else:
             st.success("✅ Kitchen inventory complete.")
-            if st.button("👉 Continue to Store Inventory"):
+            if st.button("👉 Continue to Store Inventory", key="continue_to_store"):
                 st.session_state.phase = "store"
                 st.session_state.index = 0
+                save_progress()
                 st.rerun()
 
     # Phase 2: Store Inventory
@@ -236,41 +381,57 @@ elif st.session_state.page == "inventory":
         if st.session_state.index < len(inventory_items):
             item = inventory_items[st.session_state.index]
             name = item['name']
-            st.subheader(f"Item: {name}")
-            if item['image'] and os.path.exists(item['image']):
-                st.image(item['image'], width=250)
+            st.subheader(f"Item {st.session_state.index + 1} of {len(inventory_items)}: {name}")
+            
+            image_path = f"resized_for_streamlit/{item['image']}"
+            if item['image'] and os.path.exists(image_path):
+                st.image(image_path, width=250)
             else:
                 st.warning("📷 Image not found.")
 
             prev_kitchen = st.session_state.kitchen_data.get(name)
             if prev_kitchen:
                 st.info(f"Kitchen quantity previously entered: {prev_kitchen}")
-            qty = st.text_input("Enter final store quantity:", value=st.session_state.store_data.get(name, ""), key="store_" + name)
+                
+            qty = st.text_input(
+                "Enter final store quantity:", 
+                value=st.session_state.store_data.get(name, ""), 
+                key=f"store_qty_{st.session_state.index}"
+            )
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                if st.button("Next"):
+                if st.button("Next", key=f"store_next_{st.session_state.index}"):
                     st.session_state.store_data[name] = qty
                     st.session_state.index += 1
                     save_progress()
                     st.rerun()
             with col2:
-                if st.button("Back") and st.session_state.index > 0:
-                    st.session_state.index -= 1
-                    st.rerun()
+                if st.button("Back", key=f"store_back_{st.session_state.index}"):
+                    if st.session_state.index > 0:
+                        st.session_state.index -= 1
+                        save_progress()
+                        st.rerun()
             with col3:
-                if st.button("Reset Progress"):
+                if st.button("Reset Progress", key=f"store_reset_{st.session_state.index}"):
                     if os.path.exists(SAVE_FILE):
                         os.remove(SAVE_FILE)
-                    st.session_state.clear()
+                    # Reset all session state properly
+                    st.session_state.page = "menu"
+                    st.session_state.phase = "kitchen"
+                    st.session_state.index = 0
+                    st.session_state.kitchen_data = {}
+                    st.session_state.store_data = {}
                     st.rerun()
             with col4:
-                if st.button("🏡 Main Menu"):
+                if st.button("🏡 Main Menu", key=f"store_menu_{st.session_state.index}"):
                     st.session_state.page = "menu"
+                    save_progress()
                     st.rerun()
         else:
             st.success("🎉 All inventory completed. Showing final result...")
             st.session_state.phase = "done"
+            save_progress()
             st.rerun()
 
     # Phase 3: Done
