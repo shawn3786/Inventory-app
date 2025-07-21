@@ -437,7 +437,6 @@ elif st.session_state.page == "inventory":
                 save_inventory_progress()
                 st.rerun()
 
-    # Phase 2: Store Inventory
     elif st.session_state.phase == "store":
         st.header("🏬 Step 2: Complete Store Inventory")
         if st.session_state.index < len(inventory_items):
@@ -445,7 +444,7 @@ elif st.session_state.page == "inventory":
             name = item['name']
             st.subheader(f"Item {st.session_state.index + 1} of {len(inventory_items)}: {name}")
 
-            image_path = item['image']
+            image_path = f"resized_for_streamlit/{item['image']}"
             if item['image'] and os.path.exists(image_path):
                 st.image(image_path, width=250)
             else:
@@ -461,7 +460,7 @@ elif st.session_state.page == "inventory":
                 key=f"store_qty_{st.session_state.index}"
             )
 
-            col1, col2, col3, col4, col5 = st.columns(5)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 if st.button("Next", key=f"store_next_{st.session_state.index}"):
                     st.session_state.store_data[name] = qty
@@ -478,7 +477,7 @@ elif st.session_state.page == "inventory":
                 if st.button("🗑️ Reset All", key=f"store_reset_{st.session_state.index}"):
                     if os.path.exists(INVENTORY_SAVE_FILE):
                         os.remove(INVENTORY_SAVE_FILE)
-                    # Reset all session state properly
+                    # Reset all session state properly and go back to main menu
                     st.session_state.page = "menu"
                     st.session_state.phase = "kitchen"
                     st.session_state.index = 0
@@ -487,17 +486,6 @@ elif st.session_state.page == "inventory":
                     st.success("✅ All inventory data cleared!")
                     st.rerun()
             with col4:
-                if st.button("Reset Progress", key=f"store_reset_progress_{st.session_state.index}"):
-                    if os.path.exists(INVENTORY_SAVE_FILE):
-                        os.remove(INVENTORY_SAVE_FILE)
-                    # Reset all session state properly
-                    st.session_state.page = "menu"
-                    st.session_state.phase = "kitchen"
-                    st.session_state.index = 0
-                    st.session_state.kitchen_data = {}
-                    st.session_state.store_data = {}
-                    st.rerun()
-            with col5:
                 if st.button("🏡 Main Menu", key=f"store_menu_{st.session_state.index}"):
                     st.session_state.page = "menu"
                     save_inventory_progress()
@@ -551,11 +539,10 @@ elif st.session_state.page == "inventory":
             if st.button("🗑️ Reset All Data"):
                 if os.path.exists(INVENTORY_SAVE_FILE):
                     os.remove(INVENTORY_SAVE_FILE)
-                # Reset all session state properly
+                # Reset all session state properly and go back to main menu
                 st.session_state.page = "menu"
                 st.session_state.phase = "kitchen"
                 st.session_state.index = 0
                 st.session_state.kitchen_data = {}
                 st.session_state.store_data = {}
-                st.success("✅ All inventory data cleared!")
                 st.rerun()
