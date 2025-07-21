@@ -166,6 +166,8 @@ elif st.session_state.page == "menu":
             st.rerun()
 
 elif  st.session_state.page == "inventory":
+    if st.session_state.index < len(inventory_items):
+        current_item = inventory_items[st.session_state.index]
 
 
 # --- Initialize session state ---
@@ -188,7 +190,7 @@ elif  st.session_state.page == "inventory":
         if st.session_state.index < len(kitchen_inventory_items):
             item = kitchen_inventory_items[st.session_state.index]
             st.subheader(f"Item: {item['name']}")
-
+        
             if item['image'] and os.path.exists(item['image']):
                 st.image(Image.open(item['image']), width=250)
 
