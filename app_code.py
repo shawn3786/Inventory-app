@@ -4,6 +4,21 @@ from fpdf import FPDF
 import os
 import json
 # --- Initialize session state early to avoid attribute errors ---
+
+
+SAVE_FILE = "inventory_progress.json"
+
+def save_progress():
+    with open(SAVE_FILE, "w") as f:
+        json.dump(dict(st.session_state), f)
+
+def load_progress():
+    if os.path.exists(SAVE_FILE):
+        with open(SAVE_FILE, "r") as f:
+            saved_data = json.load(f)
+            for key, value in saved_data.items():
+                st.session_state[key] = value
+# --- Initialize session state early to avoid attribute errors ---
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 if "index" not in st.session_state:
@@ -19,19 +34,9 @@ if "quantities" not in st.session_state:
 if "skipped" not in st.session_state:
     st.session_state.skipped = []
 
+# ✅ Load saved progress if available
+load_progress()
 
-SAVE_FILE = "inventory_progress.json"
-
-def save_progress():
-    with open(SAVE_FILE, "w") as f:
-        json.dump(dict(st.session_state), f)
-
-def load_progress():
-    if os.path.exists(SAVE_FILE):
-        with open(SAVE_FILE, "r") as f:
-            saved_data = json.load(f)
-            for key, value in saved_data.items():
-                st.session_state[key] = value
 inventory_items = [
 {"name": "Wings", "image": "Wings.jpg"}, # Example path
 {"name": "Filets", "image": "Filets.jpg"}, # Example path
