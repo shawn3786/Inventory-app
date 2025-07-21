@@ -2,6 +2,21 @@ import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 from fpdf import FPDF
 import os
+import json
+
+SAVE_FILE = "inventory_progress.json"
+
+def save_progress():
+    with open(SAVE_FILE, "w") as f:
+        json.dump(dict(st.session_state), f)
+
+def load_progress():
+    if os.path.exists(SAVE_FILE):
+        with open(SAVE_FILE, "r") as f:
+            saved_data = json.load(f)
+            for key, value in saved_data.items():
+                st.session_state[key] = value
+
 inventory_items = [
 {"name": "Wings", "image": "Wings.jpg"}, # Example path
 {"name": "Filets", "image": "Filets.jpg"}, # Example path
@@ -174,17 +189,26 @@ elif  st.session_state.page == "inventory":
 
             qty = st.text_input("Enter kitchen quantity:", key="kitchen_" + item['name'])
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                if st.button("Next", key=f"kitchen_next_{item['name']}"):
-                    st.session_state.kitchen_data[item['name']] = qty
+                if st.button("Save & Next"):
+                    st.session_state[current_item['name']] = qty
                     st.session_state.index += 1
-                    st.rerun()
+                    if st.session_state.index >= len(inventory_items):
+                        st.session_state.index = 0  # or stop
+                    save_progress() 
             with col2:
                 if st.button("Back", key=f"kitchen_back_{item['name']}") and st.session_state.index > 0:
                     st.session_state.index -= 1
                     st.rerun()
             with col3:
+                if st.button("Reset Progress"):
+                     if os.path.exists(SAVE_FILE):
+                        os.remove(SAVE_FILE)
+                     st.session_state.clear()
+                     st.rerun()
+
+            with col4:
                 if st.button("🏡 Main Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
@@ -211,7 +235,7 @@ elif  st.session_state.page == "inventory":
 
             qty = st.text_input("Enter final store quantity:", key="store_" + name)
 
-            col1, col2, col3, col3 = st.columns(3)
+            col1, col2, col3, col3, col4 = st.columns(4)
             with col1:
                 if st.button("Next", key=f"store_next_{name}"):
                     st.session_state.store_data[name] = qty
@@ -222,6 +246,13 @@ elif  st.session_state.page == "inventory":
                     st.session_state.index -= 1
                     st.rerun()
             with col3:
+                if st.button("Reset Progress"):
+                     if os.path.exists(SAVE_FILE):
+                        os.remove(SAVE_FILE)
+                     st.session_state.clear()
+                     st.rerun()
+
+            with col4:
                 if st.button("🏡 Main Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
@@ -288,13 +319,15 @@ elif st.session_state.page == "New Stock":
     
         qty = st.text_input("Enter quantity:", key=current_item_data['name'])
     
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
     
         with col1:
-            if st.button("Next"):
-                st.session_state.quantities[current_item_data['name']] = qty
+            if st.button("Save & Next"):
+                st.session_state[current_item['name']] = qty
                 st.session_state.index += 1
-                st.rerun()
+                if st.session_state.index >= len(inventory_items):
+                    st.session_state.index = 0  # or stop
+                save_progress() 
         with col2:
             if st.button("Skip"):
                 st.session_state.skipped.append(current_item_data['name'])
@@ -307,6 +340,12 @@ elif st.session_state.page == "New Stock":
                     st.session_state.index -= 1
                     st.rerun()
         with col4:
+             if st.button("Reset Progress"):
+                     if os.path.exists(SAVE_FILE):
+                        os.remove(SAVE_FILE)
+                     st.session_state.clear()
+                     st.rerun() 
+        with col5:
             if st.button("🏡 Main Menu"):
                 st.session_state.page = "menu"
                 st.rerun()
