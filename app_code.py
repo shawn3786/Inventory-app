@@ -7,6 +7,11 @@ import json
 
 # --- Initialize session state early to avoid attribute errors ---
 SAVE_FILE = "inventory_progress.json"
+if st.button("🧹 Reset Everything"):
+    if os.path.exists(SAVE_FILE):
+        os.remove(SAVE_FILE)
+    st.session_state.clear()
+    st.rerun()
 
 def save_progress():
     with open(SAVE_FILE, "w") as f:
