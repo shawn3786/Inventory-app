@@ -174,6 +174,11 @@ elif  st.session_state.page == "inventory":
         st.session_state.kitchen_data = {}  # to store kitchen quantities
         st.session_state.store_data = {}    # to store final store quantities
         st.session_state.index = 0
+    if 'index' not in st.session_state:
+        st.session_state.index = 0
+        current_item = inventory_items[st.session_state.index]
+        st.image(current_item['image'])
+        st.write(current_item['name'])
 
     st.title("📋 Inventory App")
 
@@ -187,8 +192,7 @@ elif  st.session_state.page == "inventory":
             if item['image'] and os.path.exists(item['image']):
                 st.image(Image.open(item['image']), width=250)
 
-            qty = st.text_input("Enter kitchen quantity:", key="kitchen_" + item['name'])
-
+            qty = st.text_input("Enter quantity:", value=st.session_state.get(current_item["name"], ""), key=current_item["name"] + "_input")
             col1, col2, col3, col4 = st.columns(4)
             with col1:
                 if st.button("Save & Next"):
