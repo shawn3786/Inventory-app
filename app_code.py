@@ -79,8 +79,7 @@ if "order_data" not in st.session_state:
 if "order_index" not in st.session_state:
     st.session_state.order_index = 0
 
-# ✅ Load previous progress after initialization
-load_inventory_progress()
+# ✅ Only load order progress automatically (inventory will load on demand)
 load_order_progress()
 inventory_items = [
     {"name": "Wings", "image": "Wings.jpg"},
@@ -207,22 +206,53 @@ if st.session_state.page == "welcome":
 # ---------------------- Menu Page ----------------------
 elif st.session_state.page == "menu":
     st.title("📋 What would you like to do?")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("📦Start Inventory", key="start_invr_button"):
-            st.session_state.page = "inventory"
-            st.session_state.phase = "kitchen"
-            st.session_state.index = 0
-            # Clear any existing progress
-            st.session_state.kitchen_data = {}
-            st.session_state.store_data = {}
-            save_inventory_progress()
-            st.rerun()
-    with col2:
-        if st.button("🛒 Make New Order", key="new_order_button"):
-            st.session_state.page = "New Stock"
-            st.session_state.index = 0
-            st.rerun()
+    # Check if there's existing inventory progress
+    has_inventory_progress = os.path.exists(INVENTORY_SAVE_FILE)
+    
+    if has_inventory_progress:
+        st.info("📋 Previous inventory progress found!")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📦 Start Fresh Inventory", key="start_fresh_invr_button"):
+                # Clear the inventory progress file completely when starting fresh
+                if os.path.exists(INVENTORY_SAVE_FILE):
+                    os.remove(INVENTORY_SAVE_FILE)
+                st.session_state.page = "inventory"
+                st.session_state.phase = "kitchen"
+                st.session_state.index = 0
+                # Clear any existing progress
+                st.session_state.kitchen_data = {}
+                st.session_state.store_data = {}
+                save_inventory_progress()
+                st.rerun()
+        with col2:
+            if st.button("🔄 Continue Previous Inventory", key="continue_invr_button"):
+                # Load previous progress and continue
+                load_inventory_progress()
+                st.session_state.page = "inventory"
+                st.rerun()
+        with col3:
+            if st.button("🛒 Make New Order", key="new_order_button"):
+                st.session_state.page = "New Stock"
+                st.session_state.order_index = 0
+                st.rerun()
+    else:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("📦 Start Inventory", key="start_invr_button"):
+                st.session_state.page = "inventory"
+                st.session_state.phase = "kitchen"
+                st.session_state.index = 0
+                # Clear any existing progress
+                st.session_state.kitchen_data = {}
+                st.session_state.store_data = {}
+                save_inventory_progress()
+                st.rerun()
+        with col2:
+            if st.button("🛒 Make New Order", key="new_order_button"):
+                st.session_state.page = "New Stock"
+                st.session_state.order_index = 0
+                st.rerun()
 
 # ---------------------- New Order Page ----------------------
 elif st.session_state.page == "New Stock":
@@ -253,7 +283,7 @@ elif st.session_state.page == "New Stock":
             key=f"order_qty_{st.session_state.order_index}"
         )
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             if st.button("Next", key=f"order_next_{st.session_state.order_index}"):
                 if qty.strip():  # Only add to order if quantity is provided
@@ -276,6 +306,12 @@ elif st.session_state.page == "New Stock":
                 st.rerun()
 
         with col4:
+            if st.button("🗑️ Clear Order", key=f"order_clear_{st.session_state.order_index}"):
+                clear_order_progress()
+                st.success("✅ Order data cleared!")
+                st.rerun()
+
+        with col5:
             if st.button("🏡 Main Menu", key=f"order_menu_{st.session_state.order_index}"):
                 st.session_state.page = "menu"
                 st.rerun()
