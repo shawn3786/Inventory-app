@@ -257,18 +257,18 @@ elif st.session_state.phase == "store":
                     if st.button("🏡 Main Menu"):
                         st.session_state.page = "menu"
                         st.rerun()
-            else:
+    else:
                 st.success("🎉 All inventory completed. Showing final result...")
                 st.session_state.phase = "done"
                 st.rerun()
     
-        elif st.session_state.phase == "done":
+    elif st.session_state.phase == "done":
             st.header("📦 Final Store Inventory")
             final_result = st.session_state.store_data
             for name, value in final_result.items():
                 st.write(f"**{name}**: {value}")
     
-            def generate_pdf(data_dict):
+    def generate_pdf(data_dict):
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=12)
@@ -286,7 +286,7 @@ elif st.session_state.phase == "store":
                 mime="application/pdf"
             )
     
-            if st.button("🔁 Restart Inventory"):
+    if st.button("🔁 Restart Inventory"):
                 for key in ["phase", "kitchen_data", "store_data", "index"]:
                     if key in st.session_state:
                         del st.session_state[key]
