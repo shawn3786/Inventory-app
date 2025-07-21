@@ -202,7 +202,7 @@ elif st.session_state.page == "New Stock":
     if st.session_state.order_index < len(inventory_items):
         item = inventory_items[st.session_state.order_index]
         st.subheader(f"Item {st.session_state.order_index + 1} of {len(inventory_items)}: {item['name']}")
-        image_path = os.path.join("images", item["image"])  # Correct full path
+        image_path = item["image"]  # Correct full path
         if item["image"] and os.path.exists(image_path):
             st.image(image_path, width=250)
         else:
