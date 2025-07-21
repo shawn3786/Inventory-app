@@ -1,23 +1,12 @@
-
 import streamlit as st
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 from fpdf import FPDF
 import os
 import json
 
 SAVE_FILE = "inventory_progress.json"
 
-# 🛡️ Make sure required session_state variables are initialized first
-if "phase" not in st.session_state:
-    st.session_state.phase = "kitchen"
-if "index" not in st.session_state:
-    st.session_state.index = 0
-if "quantities" not in st.session_state:
-    st.session_state.quantities = {}
-if "skipped" not in st.session_state:
-    st.session_state.skipped = set()
-
-# ✅ Function: Load saved progress safely
+# ✅ Load saved progress safely
 def load_progress():
     if os.path.exists(SAVE_FILE):
         try:
@@ -29,13 +18,27 @@ def load_progress():
             os.remove(SAVE_FILE)
             st.warning("⚠️ Corrupted saved file removed.")
 
-# ---------------------- Session Initialization ----------------------
+# ✅ Save progress
+def save_progress():
+    with open(SAVE_FILE, "w") as f:
+        json.dump({
+            "phase": st.session_state.phase,
+            "index": st.session_state.index,
+            "page": st.session_state.page,
+            "kitchen_data": st.session_state.kitchen_data,
+            "store_data": st.session_state.store_data,
+        }, f)
+
+# ✅ Load previous progress if any
+load_progress()
+
+# ✅ Initialize session_state only if not already present
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
-if "index" not in st.session_state:
-    st.session_state.index = 0
 if "phase" not in st.session_state:
     st.session_state.phase = "kitchen"
+if "index" not in st.session_state:
+    st.session_state.index = 0
 if "kitchen_data" not in st.session_state:
     st.session_state.kitchen_data = {}
 if "store_data" not in st.session_state:
@@ -44,10 +47,6 @@ if "quantities" not in st.session_state:
     st.session_state.quantities = {}
 if "skipped" not in st.session_state:
     st.session_state.skipped = []
-
-load_progress()
-
-
 inventory_items = [
     {"name": "Wings", "image": "Wings.jpg"},
     {"name": "Filets", "image": "Filets.jpg"},
@@ -162,11 +161,10 @@ kitchen_item_names = ["Wings", "Filets", "Fries", "Burger Buns", "Potato Pops", 
 
 kitchen_inventory_items = [item for item in store_inventory_items if item["name"] in kitchen_item_names]
 
+# ---------------------- Welcome Page ----------------------
 if st.session_state.page == "welcome":
-    image_path = "welcome.jpg"
-    if os.path.exists(image_path):
-        img = Image.open(image_path).convert("RGBA")
-        st.image(img, use_column_width=True)
+    if os.path.exists("welcome.jpg"):
+        st.image("welcome.jpg", use_column_width=True)
     if st.button("____________👉 Click to Continue____________", key="start"):
         st.session_state.page = "menu"
         st.rerun()
@@ -189,13 +187,19 @@ elif st.session_state.page == "menu":
 
 # ---------------------- Inventory Flow ----------------------
 elif st.session_state.page == "inventory":
+
+    # Phase 1: Kitchen Inventory
     if st.session_state.phase == "kitchen":
         st.header("🍳 Step 1: Enter Kitchen Inventory")
-        if st.session_state.index < len(inventory_items):
-            item = inventory_items[st.session_state.index]
+        kitchen_items = kitchen_inventory_items
+        if st.session_state.index < len(kitchen_items):
+            item = kitchen_items[st.session_state.index]
             st.subheader(f"Item: {item['name']}")
             if item['image'] and os.path.exists(item['image']):
                 st.image(item['image'], width=250)
+            else:
+                st.warning("📷 Image not found.")
+
             qty = st.text_input("Enter quantity:", value=st.session_state.kitchen_data.get(item['name'], ""), key=item['name'])
 
             col1, col2, col3, col4 = st.columns(4)
@@ -226,6 +230,7 @@ elif st.session_state.page == "inventory":
                 st.session_state.index = 0
                 st.rerun()
 
+    # Phase 2: Store Inventory
     elif st.session_state.phase == "store":
         st.header("🏬 Step 2: Complete Store Inventory")
         if st.session_state.index < len(inventory_items):
@@ -234,6 +239,9 @@ elif st.session_state.page == "inventory":
             st.subheader(f"Item: {name}")
             if item['image'] and os.path.exists(item['image']):
                 st.image(item['image'], width=250)
+            else:
+                st.warning("📷 Image not found.")
+
             prev_kitchen = st.session_state.kitchen_data.get(name)
             if prev_kitchen:
                 st.info(f"Kitchen quantity previously entered: {prev_kitchen}")
@@ -265,6 +273,7 @@ elif st.session_state.page == "inventory":
             st.session_state.phase = "done"
             st.rerun()
 
+    # Phase 3: Done
     elif st.session_state.phase == "done":
         st.header("📦 Final Store Inventory")
         final_result = st.session_state.store_data
@@ -282,15 +291,14 @@ elif st.session_state.page == "inventory":
             return pdf.output(dest="S").encode("latin-1")
 
         pdf_bytes = generate_pdf(final_result)
-        st.download_button(
+        if st.download_button(
             label="📄 Download Inventory as PDF",
             data=pdf_bytes,
             file_name="Store_Inventory.pdf",
             mime="application/pdf"
-        )
-
-        if os.path.exists(SAVE_FILE):
-            os.remove(SAVE_FILE)
+        ):
+            if os.path.exists(SAVE_FILE):
+                os.remove(SAVE_FILE)
 
         if st.button("🔁 Restart Inventory"):
             for key in ["phase", "kitchen_data", "store_data", "index"]:
