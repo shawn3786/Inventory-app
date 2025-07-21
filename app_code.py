@@ -444,7 +444,7 @@ elif st.session_state.page == "inventory":
             name = item['name']
             st.subheader(f"Item {st.session_state.index + 1} of {len(inventory_items)}: {name}")
 
-            image_path = f"resized_for_streamlit/{item['image']}"
+            image_path = item['image']
             if item['image'] and os.path.exists(image_path):
                 st.image(image_path, width=250)
             else:
