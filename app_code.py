@@ -239,7 +239,7 @@ elif st.session_state.phase == "store":
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-    if st.button("Next"):
+                    if st.button("Next"):
                         st.session_state.store_data[name] = qty
                         st.session_state.index += 1
                         st.rerun()
