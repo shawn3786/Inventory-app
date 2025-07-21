@@ -6,12 +6,7 @@ import os
 import json
 
 # --- Initialize session state early to avoid attribute errors ---
-SAVE_FILE = "inventory_progress.json"
-if st.button("🧹 Reset Everything"):
-    if os.path.exists(SAVE_FILE):
-        os.remove(SAVE_FILE)
-    st.session_state.clear()
-    st.rerun()
+
 
 def save_progress():
     with open(SAVE_FILE, "w") as f:
@@ -305,6 +300,12 @@ elif st.session_state.page == "inventory":
             st.session_state.phase = "kitchen"
             st.session_state.index = 0
             st.rerun()
+        if st.button("🧹 Reset Everything"):
+           if os.path.exists(SAVE_FILE):
+              os.remove(SAVE_FILE)
+           st.session_state.clear()
+           st.rerun()
+
 
 elif st.session_state.page == "New Stock":
     if st.session_state.index >= len(inventory_items):
