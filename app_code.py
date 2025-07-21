@@ -74,7 +74,7 @@ inventory_items = [
     {"name": "gurke can", "image": "gurke.jpg"},
     {"name": "Rosmery Katchup bottle", "image": "Rosmary Ketchup.jpg"},
     {"name": "Cheese Sauce Bottle", "image": "Cheese Sauce.jpg"},
-    {"name": "Extra Cheese Sauce Bottle", "image": "Extra Cheese Sauce Bottle.jpg"},
+    {"name": "Extra Cheese Sauce Bottle", "image": "Extra Cheese Sauce.jpg"},
     {"name": "Harisa Sauce Bottle", "image": "Harisa Sauce Bottle.jpg"},
     {"name": "BBQ Becon Sauce Bottle", "image": "BBQ Becon Sauce Bottle.jpg"},
     {"name": "Truffle Sauce Bottle", "image": "Truffle Sauce Bottle.jpg"},
