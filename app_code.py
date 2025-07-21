@@ -217,7 +217,7 @@ elif st.session_state.page == "New Stock":
             key=f"order_qty_{st.session_state.order_index}"
         )
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             if st.button("Next", key=f"order_next_{st.session_state.order_index}"):
                 if qty.strip():  # Only add to order if quantity is provided
@@ -235,8 +235,17 @@ elif st.session_state.page == "New Stock":
             if st.button("Skip Item", key=f"order_skip_{st.session_state.order_index}"):
                 st.session_state.order_index += 1
                 st.rerun()
-        
         with col4:
+            if st.button("Reset Progress", key=f"store_reset_{st.session_state.index}"):
+                if os.path.exists(SAVE_FILE):
+                    os.remove(SAVE_FILE)
+                    st.session_state.page = "menu"
+                    st.session_state.phase = "kitchen"
+                    st.session_state.index = 0
+                    st.session_state.kitchen_data = {}
+                    st.session_state.store_data = {}
+                    st.rerun()
+        with col5:
             if st.button("🏡 Main Menu", key=f"order_menu_{st.session_state.order_index}"):
                 st.session_state.page = "menu"
                 st.rerun()
