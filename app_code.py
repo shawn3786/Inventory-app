@@ -187,6 +187,8 @@ elif st.session_state.page == "menu":
 
 elif st.session_state.page == "inventory":
     st.title("📋 Inventory App")
+
+    # --- Transition if kitchen is done ---
     if st.session_state.phase == "kitchen" and st.session_state.index >= len(inventory_items):
         st.success("✅ Kitchen inventory complete.")
         st.session_state.phase = "store"
@@ -210,10 +212,9 @@ elif st.session_state.page == "inventory":
                     save_progress()
                     st.rerun()
             with col2:
-                if st.button("Back"):
-                    if st.session_state.index > 0:
-                        st.session_state.index -= 1
-                        st.rerun()
+                if st.button("Back") and st.session_state.index > 0:
+                    st.session_state.index -= 1
+                    st.rerun()
             with col3:
                 if st.button("Reset Progress"):
                     if os.path.exists(SAVE_FILE):
@@ -224,7 +225,7 @@ elif st.session_state.page == "inventory":
                 if st.button("🏡 Main Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
-       
+
     elif st.session_state.phase == "store":
         st.header("🏬 Step 2: Complete Store Inventory")
         if st.session_state.index < len(inventory_items):
@@ -245,10 +246,9 @@ elif st.session_state.page == "inventory":
                     st.session_state.index += 1
                     st.rerun()
             with col2:
-                if st.button("Back"):
-                    if st.session_state.index > 0:
-                        st.session_state.index -= 1
-                        st.rerun()
+                if st.button("Back") and st.session_state.index > 0:
+                    st.session_state.index -= 1
+                    st.rerun()
             with col3:
                 if st.button("Reset Progress"):
                     if os.path.exists(SAVE_FILE):
