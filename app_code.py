@@ -227,74 +227,74 @@ elif st.session_state.page == "inventory":
                     if st.button("🏡 Main Menu"):
                         st.session_state.page = "menu"
                         st.rerun()
-
-    elif st.session_state.phase == "store":
-        st.header("🏬 Step 2: Complete Store Inventory")
-        if st.session_state.index < len(inventory_items):
-            item = inventory_items[st.session_state.index]
-            name = item['name']
-            st.subheader(f"Item: {name}")
-            if item['image'] and os.path.exists(item['image']):
-                st.image(item['image'], width=250)
-            prev_kitchen = st.session_state.kitchen_data.get(name)
-            if prev_kitchen:
-                st.info(f"Kitchen quantity previously entered: {prev_kitchen}")
-            qty = st.text_input("Enter final store quantity:", value=st.session_state.get("store_" + name, ""), key="store_" + name)
-
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                if st.button("Next"):
-                    st.session_state.store_data[name] = qty
-                    st.session_state.index += 1
-                    st.rerun()
-            with col2:
-                if st.button("Back") and st.session_state.index > 0:
-                    st.session_state.index -= 1
-                    st.rerun()
-            with col3:
-                if st.button("Reset Progress"):
-                    if os.path.exists(SAVE_FILE):
-                        os.remove(SAVE_FILE)
-                    st.session_state.clear()
-                    st.rerun()
-            with col4:
-                if st.button("🏡 Main Menu"):
-                    st.session_state.page = "menu"
-                    st.rerun()
-        else:
-            st.success("🎉 All inventory completed. Showing final result...")
-            st.session_state.phase = "done"
-            st.rerun()
-
-    elif st.session_state.phase == "done":
-        st.header("📦 Final Store Inventory")
-        final_result = st.session_state.store_data
-        for name, value in final_result.items():
-            st.write(f"**{name}**: {value}")
-
-        def generate_pdf(data_dict):
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            pdf.cell(200, 10, txt="Final Store Inventory", ln=True, align='C')
-            pdf.ln(10)
-            for item, val in data_dict.items():
-                pdf.cell(200, 10, txt=f"{item}: {val}", ln=True)
-            return pdf.output(dest="S").encode("latin-1")
-
-        pdf_bytes = generate_pdf(final_result)
-        st.download_button(
-            label="📄 Download Inventory as PDF",
-            data=pdf_bytes,
-            file_name="Store_Inventory.pdf",
-            mime="application/pdf"
-        )
-
-        if st.button("🔁 Restart Inventory"):
-            for key in ["phase", "kitchen_data", "store_data", "index"]:
-                if key in st.session_state:
-                    del st.session_state[key]
-            st.rerun()
+    
+        elif st.session_state.phase == "store":
+            st.header("🏬 Step 2: Complete Store Inventory")
+            if st.session_state.index < len(inventory_items):
+                item = inventory_items[st.session_state.index]
+                name = item['name']
+                st.subheader(f"Item: {name}")
+                if item['image'] and os.path.exists(item['image']):
+                    st.image(item['image'], width=250)
+                prev_kitchen = st.session_state.kitchen_data.get(name)
+                if prev_kitchen:
+                    st.info(f"Kitchen quantity previously entered: {prev_kitchen}")
+                qty = st.text_input("Enter final store quantity:", value=st.session_state.get("store_" + name, ""), key="store_" + name)
+    
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    if st.button("Next"):
+                        st.session_state.store_data[name] = qty
+                        st.session_state.index += 1
+                        st.rerun()
+                with col2:
+                    if st.button("Back") and st.session_state.index > 0:
+                        st.session_state.index -= 1
+                        st.rerun()
+                with col3:
+                    if st.button("Reset Progress"):
+                        if os.path.exists(SAVE_FILE):
+                            os.remove(SAVE_FILE)
+                        st.session_state.clear()
+                        st.rerun()
+                with col4:
+                    if st.button("🏡 Main Menu"):
+                        st.session_state.page = "menu"
+                        st.rerun()
+            else:
+                st.success("🎉 All inventory completed. Showing final result...")
+                st.session_state.phase = "done"
+                st.rerun()
+    
+        elif st.session_state.phase == "done":
+            st.header("📦 Final Store Inventory")
+            final_result = st.session_state.store_data
+            for name, value in final_result.items():
+                st.write(f"**{name}**: {value}")
+    
+            def generate_pdf(data_dict):
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                pdf.cell(200, 10, txt="Final Store Inventory", ln=True, align='C')
+                pdf.ln(10)
+                for item, val in data_dict.items():
+                    pdf.cell(200, 10, txt=f"{item}: {val}", ln=True)
+                return pdf.output(dest="S").encode("latin-1")
+    
+            pdf_bytes = generate_pdf(final_result)
+            st.download_button(
+                label="📄 Download Inventory as PDF",
+                data=pdf_bytes,
+                file_name="Store_Inventory.pdf",
+                mime="application/pdf"
+            )
+    
+            if st.button("🔁 Restart Inventory"):
+                for key in ["phase", "kitchen_data", "store_data", "index"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
+                st.rerun()
 
 elif st.session_state.page == "New Stock":
     if st.session_state.index >= len(inventory_items):
