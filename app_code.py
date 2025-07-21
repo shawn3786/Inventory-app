@@ -277,8 +277,6 @@ elif st.session_state.page == "New Stock":
 
         with col4:
             if st.button("🏡 Main Menu", key=f"order_menu_{st.session_state.order_index}"):
-                # Reset order data when going back to main menu
-                clear_order_progress()
                 st.session_state.page = "menu"
                 st.rerun()
 
@@ -325,18 +323,14 @@ elif st.session_state.page == "New Stock":
 
             pdf_bytes = generate_order_pdf(st.session_state.order_data)
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
-                if st.download_button(
+                st.download_button(
                     label="📄 Download Order List as PDF",
                     data=pdf_bytes,
                     file_name="New_Stock_Order.pdf",
                     mime="application/pdf"
-                ):
-                    # Auto-reset after download
-                    clear_order_progress()
-                    st.success("✅ Order downloaded! Starting fresh order...")
-                    st.rerun()
+                )
 
             with col2:
                 if st.button("🔁 Create New Order"):
@@ -344,19 +338,28 @@ elif st.session_state.page == "New Stock":
                     st.rerun()
 
             with col3:
-                if st.button("🏡 Back to Menu"):
-                    # Reset order data when going back to main menu
+                if st.button("🗑️ Reset Order Data"):
                     clear_order_progress()
+                    st.success("✅ Order data cleared!")
+                    st.rerun()
+
+            with col4:
+                if st.button("🏡 Back to Menu"):
                     st.session_state.page = "menu"
                     st.rerun()
 
         else:
             st.warning("No items were added to the order.")
-            if st.button("🏡 Back to Menu"):
-                # Reset order data when going back to main menu
-                clear_order_progress()
-                st.session_state.page = "menu"
-                st.rerun()
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🏡 Back to Menu"):
+                    st.session_state.page = "menu"
+                    st.rerun()
+            with col2:
+                if st.button("🗑️ Reset Order Data"):
+                    clear_order_progress()
+                    st.success("✅ Order data cleared!")
+                    st.rerun()
 
 # ---------------------- Inventory Flow ----------------------
 elif st.session_state.page == "inventory":
@@ -399,7 +402,7 @@ elif st.session_state.page == "inventory":
                         save_inventory_progress()
                         st.rerun()
             with col3:
-                if st.button("Reset Progress", key=f"kitchen_reset_{st.session_state.index}"):
+                if st.button("🗑️ Reset All", key=f"kitchen_reset_{st.session_state.index}"):
                     if os.path.exists(INVENTORY_SAVE_FILE):
                         os.remove(INVENTORY_SAVE_FILE)
                     # Reset all session state properly
@@ -408,6 +411,7 @@ elif st.session_state.page == "inventory":
                     st.session_state.index = 0
                     st.session_state.kitchen_data = {}
                     st.session_state.store_data = {}
+                    st.success("✅ All inventory data cleared!")
                     st.rerun()
             with col4:
                 if st.button("🏡 Main Menu", key=f"kitchen_menu_{st.session_state.index}"):
@@ -446,7 +450,7 @@ elif st.session_state.page == "inventory":
                 key=f"store_qty_{st.session_state.index}"
             )
 
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 if st.button("Next", key=f"store_next_{st.session_state.index}"):
                     st.session_state.store_data[name] = qty
@@ -460,7 +464,19 @@ elif st.session_state.page == "inventory":
                         save_inventory_progress()
                         st.rerun()
             with col3:
-                if st.button("Reset Progress", key=f"store_reset_{st.session_state.index}"):
+                if st.button("🗑️ Reset All", key=f"store_reset_{st.session_state.index}"):
+                    if os.path.exists(INVENTORY_SAVE_FILE):
+                        os.remove(INVENTORY_SAVE_FILE)
+                    # Reset all session state properly
+                    st.session_state.page = "menu"
+                    st.session_state.phase = "kitchen"
+                    st.session_state.index = 0
+                    st.session_state.kitchen_data = {}
+                    st.session_state.store_data = {}
+                    st.success("✅ All inventory data cleared!")
+                    st.rerun()
+            with col4:
+                if st.button("Reset Progress", key=f"store_reset_progress_{st.session_state.index}"):
                     if os.path.exists(INVENTORY_SAVE_FILE):
                         os.remove(INVENTORY_SAVE_FILE)
                     # Reset all session state properly
@@ -470,7 +486,7 @@ elif st.session_state.page == "inventory":
                     st.session_state.kitchen_data = {}
                     st.session_state.store_data = {}
                     st.rerun()
-            with col4:
+            with col5:
                 if st.button("🏡 Main Menu", key=f"store_menu_{st.session_state.index}"):
                     st.session_state.page = "menu"
                     save_inventory_progress()
@@ -499,17 +515,36 @@ elif st.session_state.page == "inventory":
             return pdf.output(dest="S").encode("latin-1")
 
         pdf_bytes = generate_pdf(final_result)
-        if st.download_button(
-            label="📄 Download Inventory as PDF",
-            data=pdf_bytes,
-            file_name="Store_Inventory.pdf",
-            mime="application/pdf"
-        ):
-            if os.path.exists(INVENTORY_SAVE_FILE):
-                os.remove(INVENTORY_SAVE_FILE)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.download_button(
+                label="📄 Download Inventory as PDF",
+                data=pdf_bytes,
+                file_name="Store_Inventory.pdf",
+                mime="application/pdf"
+            ):
+                if os.path.exists(INVENTORY_SAVE_FILE):
+                    os.remove(INVENTORY_SAVE_FILE)
 
-        if st.button("🔁 Restart Inventory"):
-            for key in ["phase", "kitchen_data", "store_data", "index"]:
-                if key in st.session_state:
-                    del st.session_state[key]
-            st.rerun()
+        with col2:
+            if st.button("🔁 Restart Inventory"):
+                if os.path.exists(INVENTORY_SAVE_FILE):
+                    os.remove(INVENTORY_SAVE_FILE)
+                for key in ["phase", "kitchen_data", "store_data", "index"]:
+                    if key in st.session_state:
+                        del st.session_state[key]
+                st.rerun()
+
+        with col3:
+            if st.button("🗑️ Reset All Data"):
+                if os.path.exists(INVENTORY_SAVE_FILE):
+                    os.remove(INVENTORY_SAVE_FILE)
+                # Reset all session state properly
+                st.session_state.page = "menu"
+                st.session_state.phase = "kitchen"
+                st.session_state.index = 0
+                st.session_state.kitchen_data = {}
+                st.session_state.store_data = {}
+                st.success("✅ All inventory data cleared!")
+                st.rerun()
