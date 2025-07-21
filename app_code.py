@@ -5,15 +5,19 @@ from fpdf import FPDF
 import os
 import json
 
-# --- Initialize session state early to avoid attribute errors ---
-
 SAVE_FILE = "inventory_progress.json"
 
-# ---------------------- Save & Load Functions ----------------------
-def save_progress():
-    with open(SAVE_FILE, "w") as f:
-        json.dump(dict(st.session_state), f)
+# 🛡️ Make sure required session_state variables are initialized first
+if "phase" not in st.session_state:
+    st.session_state.phase = "kitchen"
+if "index" not in st.session_state:
+    st.session_state.index = 0
+if "quantities" not in st.session_state:
+    st.session_state.quantities = {}
+if "skipped" not in st.session_state:
+    st.session_state.skipped = set()
 
+# ✅ Function: Load saved progress safely
 def load_progress():
     if os.path.exists(SAVE_FILE):
         try:
@@ -23,7 +27,7 @@ def load_progress():
                     st.session_state[key] = value
         except (json.JSONDecodeError, ValueError):
             os.remove(SAVE_FILE)
-            st.warning("⚠️ Corrupted progress file detected and deleted. Starting fresh.")
+            st.warning("⚠️ Corrupted saved file removed.")
 
 # ---------------------- Session Initialization ----------------------
 if "page" not in st.session_state:
