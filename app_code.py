@@ -234,7 +234,7 @@ elif st.session_state.page == "menu":
 elif st.session_state.page == "New Order":
     st.header("Please write the Name of item that You want to add in inventory")
     if "inventory_items" not in st.session_state:
-        st.session_state.inventory = {}
+        st.session_state.inventory_items.append({"name": new_name, "image": ""})
     item_name = st.text_input("Enter item name")
     col1, col2 = st.columns(2)
     with col1:
