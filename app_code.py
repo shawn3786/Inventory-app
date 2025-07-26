@@ -7,7 +7,7 @@ import json
 INVENTORY_SAVE_FILE = "inventory_progress.json"
 ORDER_SAVE_FILE = "order_progress.json"
 
-# ✅ Load saved inventory progress safely
+
 def load_inventory_progress():
     if os.path.exists(INVENTORY_SAVE_FILE):
         try:
@@ -22,7 +22,7 @@ def load_inventory_progress():
             os.remove(INVENTORY_SAVE_FILE)
             st.warning("⚠️ Corrupted inventory file removed.")
 
-# ✅ Save inventory progress
+
 def save_inventory_progress():
     with open(INVENTORY_SAVE_FILE, "w") as f:
         json.dump({
@@ -32,7 +32,7 @@ def save_inventory_progress():
             "store_data": st.session_state.store_data,
         }, f)
 
-# ✅ Load saved order progress safely
+
 def load_order_progress():
     if os.path.exists(ORDER_SAVE_FILE):
         try:
@@ -44,7 +44,7 @@ def load_order_progress():
             os.remove(ORDER_SAVE_FILE)
             st.warning("⚠️ Corrupted order file removed.")
 
-# ✅ Save order progress
+
 def save_order_progress():
     with open(ORDER_SAVE_FILE, "w") as f:
         json.dump({
@@ -52,14 +52,14 @@ def save_order_progress():
             "order_index": st.session_state.order_index,
         }, f)
 
-# ✅ Clear order progress
+
 def clear_order_progress():
     if os.path.exists(ORDER_SAVE_FILE):
         os.remove(ORDER_SAVE_FILE)
     st.session_state.order_data = {}
     st.session_state.order_index = 0
 
-# ✅ Initialize session_state first, then load progress
+
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 if "phase" not in st.session_state:
@@ -79,7 +79,7 @@ if "order_data" not in st.session_state:
 if "order_index" not in st.session_state:
     st.session_state.order_index = 0
 
-# ✅ Only load order progress automatically (inventory will load on demand)
+
 load_order_progress()
 inventory_items = [
     {"name": "Wings", "image": "Wings.jpg"},
@@ -195,7 +195,7 @@ kitchen_item_names = ["Wings", "Filets", "Fries", "Burger Buns", "Potato Pops", 
 
 kitchen_inventory_items = [item for item in store_inventory_items if item["name"] in kitchen_item_names]
 
-# ---------------------- Welcome Page ----------------------
+
 if st.session_state.page == "welcome":
     if os.path.exists("welcome.jpg"):
         st.image("welcome.jpg", use_column_width=True)
@@ -203,14 +203,12 @@ if st.session_state.page == "welcome":
         st.session_state.page = "menu"
         st.rerun()
 
-# ---------------------- Menu Page ----------------------
 elif st.session_state.page == "menu":
     st.title("📋 What would you like to do?")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("📦 Start Inventory", key="start_invr_button"):
-            # Check if there's existing inventory progress and auto-load it
             if os.path.exists(INVENTORY_SAVE_FILE):
                 load_inventory_progress()
                 st.info("🔄 Continuing from previous inventory progress...")
@@ -229,11 +227,32 @@ elif st.session_state.page == "menu":
             st.session_state.order_index = 0
             st.rerun()
 
-# ---------------------- New Order Page ----------------------
+    with col3:
+        if st.button("Add New Items in Inventory", key = "Add Items)
+            st.session_state.page = "New Order"
+            st.rerun()
+elif st.session_state.page == "New Stock"
+    st.header("Please write the Name of item that You want to add in inventory")
+    item_name = st.text_input("Enter item name")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Saved")
+            if item_name:
+                if item_name in st.session_state.inventory:
+                    st.warning(f"'{item_name}' already exists.")
+                else:
+                    st.session_state.inventory[item_name] = ""  # or use "no_image" or None
+                    st.success(f"Added '{item_name}' with no image.")
+            else:
+                st.error("Please enter an item name.")
+    with col2:
+        if st.button("🏡 Back to Menu"):
+            st.session_state.page = "menu"
+            st.rerun()
+
 elif st.session_state.page == "New Stock":
     st.header("🛒 New Order - Add Items to Order List")
 
-    # Initialize order data if not exists
     if "order_data" not in st.session_state:
         st.session_state.order_data = {}
     if "order_index" not in st.session_state:
