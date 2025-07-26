@@ -228,15 +228,17 @@ elif st.session_state.page == "menu":
             st.rerun()
 
     with col3:
-        if st.button("Add New Items in Inventory", key = "Add Items")
+        if st.button("Add New Items in Inventory", key = "Add Items"):
             st.session_state.page = "New Order"
             st.rerun()
-elif st.session_state.page == "New Stock"
+elif st.session_state.page == "New Stock":
     st.header("Please write the Name of item that You want to add in inventory")
+    if "inventory_items" not in st.session_state:
+        st.session_state.inventory = {}
     item_name = st.text_input("Enter item name")
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Saved")
+        if st.button("Saved"):
             if item_name:
                 if item_name in st.session_state.inventory:
                     st.warning(f"'{item_name}' already exists.")
