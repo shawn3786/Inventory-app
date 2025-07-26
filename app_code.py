@@ -228,7 +228,7 @@ elif st.session_state.page == "menu":
             st.rerun()
 
     with col3:
-        if st.button("Add New Items in Inventory", key = "Add Items)
+        if st.button("Add New Items in Inventory", key = "Add Items")
             st.session_state.page = "New Order"
             st.rerun()
 elif st.session_state.page == "New Stock"
