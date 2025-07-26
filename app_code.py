@@ -206,7 +206,7 @@ if st.session_state.page == "welcome":
 elif st.session_state.page == "menu":
     st.title("📋 What would you like to do?")
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
         if st.button("📦 Start Inventory", key="start_invr_button"):
             if os.path.exists(INVENTORY_SAVE_FILE):
@@ -227,30 +227,7 @@ elif st.session_state.page == "menu":
             st.session_state.order_index = 0
             st.rerun()
 
-    with col3:
-        if st.button("Add New Items in Inventory", key = "Add Items"):
-            st.session_state.page = "New Order"
-            st.rerun()
-elif st.session_state.page == "New Order":
-    st.header("Please write the Name of item that You want to add in inventory")
-    if "inventory_items" not in st.session_state:
-        st.session_state.inventory_items.append({"name": new_name, "image": ""})
-    item_name = st.text_input("Enter item name")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Saved"):
-            if item_name:
-                if item_name in st.session_state.inventory:
-                    st.warning(f"'{item_name}' already exists.")
-                else:
-                    st.session_state.inventory[item_name] = ""  # or use "no_image" or None
-                    st.success(f"Added '{item_name}' with no image.")
-            else:
-                st.error("Please enter an item name.")
-    with col2:
-        if st.button("🏡 Back to Menu"):
-            st.session_state.page = "menu"
-            st.rerun()
+  
 
 elif st.session_state.page == "New Stock":
     st.header("🛒 New Order - Add Items to Order List")
@@ -333,7 +310,6 @@ elif st.session_state.page == "New Stock":
 
             st.info(f"**Total items to order: {total_items}**")
 
-            # Generate PDF for order
             def generate_order_pdf(order_dict):
                 pdf = FPDF()
                 pdf.add_page()
@@ -393,7 +369,6 @@ elif st.session_state.page == "New Stock":
                     st.success("✅ Order data cleared!")
                     st.rerun()
 
-# ---------------------- Inventory Flow ----------------------
 elif st.session_state.page == "inventory":
 
     # Phase 1: Kitchen Inventory
@@ -517,7 +492,6 @@ elif st.session_state.page == "inventory":
             save_inventory_progress()
             st.rerun()
 
-    # Phase 3: Done
     elif st.session_state.phase == "done":
         st.header("📦 Final Store Inventory")
         final_result = st.session_state.store_data
