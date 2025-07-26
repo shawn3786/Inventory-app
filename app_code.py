@@ -231,7 +231,7 @@ elif st.session_state.page == "menu":
         if st.button("Add New Items in Inventory", key = "Add Items"):
             st.session_state.page = "New Order"
             st.rerun()
-elif st.session_state.page == "New Stock":
+elif st.session_state.page == "New Order":
     st.header("Please write the Name of item that You want to add in inventory")
     if "inventory_items" not in st.session_state:
         st.session_state.inventory = {}
