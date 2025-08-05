@@ -104,7 +104,7 @@ inventory_items = [
     {"name": "Dairy Cream", "image": "Dairy Cream.jpg"},
     {"name": "Dark Chocolate Sauce", "image": "Dark Chocolate Sauce.jpg"},
     {"name": "Jalapenos can", "image": "Jalapenos can.jpg"},
-    {"name": "Pickle Bottle", "image: "pickle bottle.jpg"},
+    {"name": "Pickle Bottle", "image": "pickle bottle.jpg"},
     {"name": "Coleslaw", "image": "Coleslaw.jpg"},
     {"name": "gurke can", "image": "gurke.jpg"},
     {"name": "Rosmery Katchup bottle", "image": "Rosmary Ketchup.jpg"},
